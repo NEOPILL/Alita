@@ -596,19 +596,75 @@
 
     drawMatrix();
 
-    /* ========== MESSAGE FORM STUB ========== */
+    <script>
+/* ========== LOGIN / SESSION SYSTEM (unchanged) ========== */
+/* Your login code stays exactly as it is above */
 
-    const msgForm = document.getElementById("msgForm");
-    const msgInput = document.getElementById("msgInput");
 
-    msgForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = msgInput.value.trim();
-      if (!text) return;
+/* =============================
+   N8N INTEGRATION FOR ALITA CHAT
+   Production Webhook Endpoint
+============================= */
 
-      console.log("Message to ALITA:", text);
-      msgInput.value = "";
+const N8N_ENDPOINT = "http://umbrel.local:5678/webhook/Alita";
+
+const msgForm = document.getElementById("msgForm");
+const msgInput = document.getElementById("msgInput");
+const bubbleContainer = document.querySelector(".bubble-ai");
+
+/**
+ * Adds a chat bubble under ALITA's greeting
+ */
+function appendBubble(text, isUser = false) {
+  const bubble = document.createElement("section");
+  bubble.className = "bubble-ai";
+  bubble.style.background =
+    isUser
+      ? "linear-gradient(135deg, #ff1fbf, #ff5ed5)"
+      : "radial-gradient(circle at top, var(--cyan-soft), var(--cyan))";
+
+  bubble.style.color = isUser ? "#050108" : "#001018";
+  bubble.textContent = text;
+  bubbleContainer.insertAdjacentElement("afterend", bubble);
+}
+
+/**
+ * SEND MESSAGE → n8n → wait for reply
+ */
+msgForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = msgInput.value.trim();
+  if (!text) return;
+
+  // user bubble
+  appendBubble(text, true);
+
+  msgInput.value = "";
+  msgInput.disabled = true;
+
+  try {
+    const res = await fetch(N8N_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: text })
     });
-  </script>
+
+    const json = await res.json();
+    const reply = json.reply || "No response received.";
+
+    // AI bubble
+    appendBubble(reply, false);
+
+  } catch (err) {
+    appendBubble("⚠️ Connection error. Check your node.", false);
+    console.error(err);
+  }
+
+  msgInput.disabled = false;
+  msgInput.focus();
+});
+</script>
 </body>
 </html>
