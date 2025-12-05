@@ -1,458 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>NEO Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --neo-bg: #050509;
-      --neo-panel: rgba(5, 5, 20, 0.9);
-      --neo-border: rgba(255, 0, 190, 0.35);
-      --neo-pink: #ff00a8;
-      --neo-pink-soft: #ff4fd0;
-      --neo-blue: #00c8ff;
-      --neo-blue-soft: #57e1ff;
-      --neo-text-main: #f8f8ff;
-      --neo-text-muted: #a0a2bf;
-      --neo-input-bg: #11111c;
-      --neo-input-border: #333348;
-      --neo-shadow:
-        0 0 20px rgba(255, 0, 168, 0.25),
-        0 0 40px rgba(0, 200, 255, 0.15);
-      --radius-lg: 18px;
-      --radius-pill: 999px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEO Chat</title>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+  /* ===== GLOBAL ===== */
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: black;
+    color: #fff;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-      color: var(--neo-text-main);
-      background: radial-gradient(circle at top, #1c0026 0, #02010a 45%, #000 100%);
-      overflow: hidden;
-    }
+  /* ===== MATRIX CANVAS ===== */
+  #matrix-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: black;
+  }
 
-    /* Matrix canvas background */
-    #matrix-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: transparent;
-    }
+  /* ===== CHAT WINDOW ===== */
+  .chat-box {
+    width: 90%;
+    max-width: 500px;
+    margin: 4vh auto;
+    background: rgba(0,0,0,0.75);
+    border: 1px solid #ff009d;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
 
-    .chat-shell {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100vw;
-      height: 100vh;
-      padding: 16px;
-    }
+  .chat-header {
+    padding: 16px;
+    background: #000;
+    color: #ff009d;
+    font-size: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #ff009d;
+  }
 
-    .chat-card {
-      width: 100%;
-      max-width: 480px;
-      height: 100%;
-      max-height: 720px;
-      background: linear-gradient(
-          135deg,
-          rgba(255, 0, 168, 0.12),
-          rgba(0, 200, 255, 0.06)
-        ),
-        var(--neo-panel);
-      border-radius: 24px;
-      border: 1px solid var(--neo-border);
-      box-shadow: var(--neo-shadow);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      backdrop-filter: blur(16px);
-    }
+  .chat-body {
+    padding: 16px;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
 
-    .chat-header {
-      padding: 18px 20px 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  /* ===== MESSAGES ===== */
+  .msg {
+    margin-bottom: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    width: fit-content;
+    max-width: 85%;
+    font-size: 1rem;
+    line-height: 1.4;
+    animation: fadeIn .3s ease;
+  }
 
-    .chat-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 30% 0%, #ffffff, transparent 55%),
-        radial-gradient(circle at 80% 120%, #00eaff, transparent 55%),
-        radial-gradient(circle at 0% 120%, #ff00a8, transparent 60%);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow:
-        0 0 12px rgba(255, 0, 168, 0.7),
-        0 0 26px rgba(0, 200, 255, 0.5);
-      position: relative;
-    }
+  .msg-ai {
+    background: #00c8ff;
+    color: #000;
+    border: 1px solid #00e1ff;
+    box-shadow: 0 0 10px #00e1ff;
+  }
 
-    .chat-avatar::after {
-      content: "NEO";
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: #0b0b18;
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-    }
+  .msg-user {
+    background: #ff009d;
+    color: #000;
+    border: 1px solid #ff4dd3;
+    box-shadow: 0 0 10px #ff009d;
+    margin-left: auto;
+  }
 
-    .chat-header-text h1 {
-      font-size: 1.2rem;
-      letter-spacing: 0.03em;
-      color: var(--neo-pink-soft);
-    }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(6px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
 
-    .chat-header-text p {
-      font-size: 0.8rem;
-      color: var(--neo-text-muted);
-    }
+  /* ===== INPUT AREA ===== */
+  .chat-input-area {
+    display: flex;
+    border-top: 1px solid #ff009d;
+  }
 
-    .chat-body {
-      flex: 1;
-      position: relative;
-      overflow-y: auto;
-      padding: 16px 16px 8px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--neo-pink-soft) transparent;
-    }
+  #chat-input {
+    flex: 1;
+    padding: 14px;
+    background: #000;
+    color: #ff009d;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+  }
 
-    .chat-body::-webkit-scrollbar {
-      width: 6px;
-    }
+  #send-btn {
+    padding: 14px 22px;
+    background: #ff009d;
+    border: none;
+    color: #000;
+    cursor: pointer;
+    font-weight: bold;
+    transition: .2s;
+  }
 
-    .chat-body::-webkit-scrollbar-thumb {
-      background: radial-gradient(circle, var(--neo-pink-soft), transparent);
-      border-radius: 999px;
-    }
-
-    .message-row {
-      display: flex;
-      margin-bottom: 10px;
-    }
-
-    .message-row.user {
-      justify-content: flex-end;
-    }
-
-    .message-row.ai {
-      justify-content: flex-start;
-    }
-
-    .bubble {
-      max-width: 80%;
-      padding: 10px 14px;
-      border-radius: 18px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      position: relative;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
-
-    .bubble.user {
-      background: radial-gradient(circle at 20% 0%, #ffd6f4 0, #ff00a8 40%, #7a004b 100%);
-      color: #050308;
-      border-radius: 18px 18px 4px 18px;
-      box-shadow:
-        0 0 12px rgba(255, 0, 168, 0.7),
-        0 0 30px rgba(255, 0, 168, 0.35);
-    }
-
-    .bubble.ai {
-      background: radial-gradient(circle at 20% 0%, #e5f9ff 0, #00c8ff 38%, #005a82 100%);
-      color: #02020f;
-      border-radius: 18px 18px 18px 4px;
-      box-shadow:
-        0 0 12px rgba(0, 200, 255, 0.7),
-        0 0 30px rgba(0, 200, 255, 0.35);
-    }
-
-    .timestamp {
-      font-size: 0.65rem;
-      color: var(--neo-text-muted);
-      margin-top: 4px;
-    }
-
-    .message-row.user .timestamp {
-      text-align: right;
-      padding-right: 4px;
-    }
-
-    .message-row.ai .timestamp {
-      text-align: left;
-      padding-left: 4px;
-    }
-
-    .chat-footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 10px;
-      background: rgba(3, 3, 12, 0.92);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .input-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #message-input {
-      flex: 1;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--neo-input-border);
-      background: var(--neo-input-bg);
-      color: var(--neo-text-main);
-      padding: 10px 14px;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-    }
-
-    #message-input::placeholder {
-      color: #666684;
-    }
-
-    #message-input:focus {
-      border-color: var(--neo-pink-soft);
-      box-shadow:
-        0 0 0 1px rgba(255, 0, 168, 0.5),
-        0 0 18px rgba(255, 0, 168, 0.4);
-      background: #151526;
-    }
-
-    #send-btn {
-      border-radius: var(--radius-pill);
-      border: none;
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: radial-gradient(circle at 20% 0%, #ffe1ff 0, #ff00a8 35%, #8f0071 100%);
-      color: #050208;
-      box-shadow:
-        0 0 14px rgba(255, 0, 168, 0.9),
-        0 0 30px rgba(255, 0, 168, 0.6);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
-    }
-
-    #send-btn:hover {
-      filter: brightness(1.08);
-      transform: translateY(-1px);
-    }
-
-    #send-btn:active {
-      transform: translateY(1px) scale(0.97);
-      box-shadow:
-        0 0 8px rgba(255, 0, 168, 0.7),
-        0 0 18px rgba(255, 0, 168, 0.4);
-    }
-
-    .status-line {
-      font-size: 0.7rem;
-      color: var(--neo-text-muted);
-      text-align: left;
-      padding-inline: 4px;
-    }
-
-    .status-line span {
-      color: var(--neo-blue-soft);
-    }
-
-    @media (max-width: 600px) {
-      .chat-card {
-        max-width: 100%;
-        max-height: 100%;
-        border-radius: 0;
-      }
-    }
-  </style>
+  #send-btn:hover {
+    background: #ff4dd3;
+  }
+</style>
 </head>
 <body>
-  <canvas id="matrix-canvas"></canvas>
 
-  <div class="chat-shell">
-    <div class="chat-card">
-      <header class="chat-header">
-        <div class="chat-avatar"></div>
-        <div class="chat-header-text">
-          <h1>Hi there! 👋</h1>
-          <p>NEO online. Neon matrix link established.</p>
-        </div>
-      </header>
+<canvas id="matrix-canvas"></canvas>
 
-      <main id="chat-body" class="chat-body"></main>
+<div class="chat-box">
+  <div class="chat-header">Hi there! 👋</div>
 
-      <footer class="chat-footer">
-        <div class="input-row">
-          <input
-            id="message-input"
-            type="text"
-            autocomplete="off"
-            placeholder="Type your question for NEO..."
-          />
-          <button id="send-btn" type="button">
-            Send ▷
-          </button>
-        </div>
-        <div class="status-line">
-          Status: <span id="status-indicator">Local demo (no backend wired)</span>
-        </div>
-      </footer>
+  <div class="chat-body" id="chat-body">
+    <div class="msg msg-ai">
+      My name is NEO. How can I assist you today?
     </div>
   </div>
 
-  <script>
-    // ========= Matrix rain background (neon pink) =========
-    (function matrixRain() {
-      const canvas = document.getElementById('matrix-canvas');
-      const ctx = canvas.getContext('2d');
+  <div class="chat-input-area">
+    <input id="chat-input" type="text" placeholder="Type your question…">
+    <button id="send-btn">SEND</button>
+  </div>
+</div>
 
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      window.addEventListener('resize', resize);
-      resize();
+<script>
+/* ===== MATRIX RAIN ===== */
+(function matrixRain() {
+  const canvas = document.getElementById("matrix-canvas");
+  const ctx = canvas.getContext("2d");
 
-      const letters = '01NEO$#@░▒▓';
-      const fontSize = 16;
-      let columns = Math.floor(canvas.width / fontSize);
-      let drops = Array(columns).fill(1);
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
 
-      function draw() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.13)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const letters = "10NEO░▓█$*";
+  const fontSize = 22;
+  const speed = 0.9; // 👈 Adjust here if needed
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
 
-        ctx.fillStyle = '#ff00a8';
-        ctx.shadowColor = '#ff00a8';
-        ctx.shadowBlur = 12;
-        ctx.font = fontSize + "px monospace";
+  function draw() {
+    ctx.fillStyle = "rgba(0,0,0,0.14)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < drops.length; i++) {
-          const text = letters.charAt(Math.floor(Math.random() * letters.length));
-          const x = i * fontSize;
-          const y = drops[i] * fontSize;
-          ctx.fillText(text, x, y);
+    ctx.fillStyle = "#ff009d";
+    ctx.shadowColor = "#ff009d";
+    ctx.shadowBlur = 18;
+    ctx.font = fontSize + "px monospace";
 
-          if (y > canvas.height && Math.random() > 0.975) {
-            drops[i] = 0;
-          }
-          drops[i]++;
-        }
-        requestAnimationFrame(draw);
-      }
-      draw();
-    })();
+    for (let i = 0; i < drops.length; i++) {
+      const char = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
 
-    // ========= Chat logic (front-end only; backend stub) =========
-    const chatBody = document.getElementById('chat-body');
-    const input = document.getElementById('message-input');
-    const sendBtn = document.getElementById('send-btn');
-    const statusIndicator = document.getElementById('status-indicator');
-
-    function addMessage(text, who = 'ai') {
-      const row = document.createElement('div');
-      row.className = `message-row ${who}`;
-
-      const bubble = document.createElement('div');
-      bubble.className = `bubble ${who}`;
-      bubble.textContent = text;
-
-      const ts = document.createElement('div');
-      ts.className = 'timestamp';
-      ts.textContent = new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      row.appendChild(bubble);
-      chatBody.appendChild(row);
-      chatBody.appendChild(ts);
-      chatBody.scrollTop = chatBody.scrollHeight;
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.985) drops[i] = 0;
+      drops[i] += speed;
     }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
 
-    // Initial greeting
-    addMessage("My name is NEO. How can I assist you today?", "ai");
+<script>
+/* ===== CHAT SEND LOGIC (LOCAL DEMO) ===== */
+const chatBody = document.getElementById("chat-body");
+const input = document.getElementById("chat-input");
+document.getElementById("send-btn").onclick = send;
 
-    async function handleSend() {
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = '';
+function send() {
+  const text = input.value.trim();
+  if (!text) return;
 
-      addMessage(text, 'user');
+  addMsg(text, "user");
+  input.value = "";
 
-      // ---- Replace this block with real n8n call when ready ----
-      // For now, fake a reply so you can see the styling.
-      statusIndicator.textContent = 'Local demo reply (no webhook configured)';
-      setTimeout(() => {
-        addMessage("This is a demo response. Once you wire this page to your n8n chat webhook, my replies will come from your workflow instead of this placeholder.", 'ai');
-      }, 400);
-      // -----------------------------------------------------------
-    }
+  // FAKE AI reply for now — replace with webhook later
+  setTimeout(() => addMsg("I'm online, awaiting backend hookup.", "ai"), 800);
+}
 
-    sendBtn.addEventListener('click', handleSend);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    });
+function addMsg(message, type) {
+  const div = document.createElement("div");
+  div.className = "msg msg-" + type;
+  div.textContent = message;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+</script>
 
-    /*
-      === HOW TO WIRE TO N8N LATER ===
-
-      1. Replace the "demo reply" block in handleSend() with something like:
-
-        statusIndicator.textContent = 'Connecting to n8n...';
-
-        try {
-          const res = await fetch('http://YOUR-N8N-HOST:5678/webhook/XXXX/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              message: text,
-              sessionId: 'neo-browser'  // or any session tracking you want
-            })
-          });
-
-          const data = await res.json();
-          addMessage(data.answer || data.message || JSON.stringify(data), 'ai');
-          statusIndicator.textContent = 'Connected to n8n';
-        } catch (err) {
-          addMessage('Error talking to n8n 😢', 'ai');
-          statusIndicator.textContent = 'Error contacting n8n';
-        }
-
-      2. Adjust the URL and payload fields to match your n8n "When chat message received" config.
-    */
-  </script>
 </body>
 </html>
