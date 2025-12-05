@@ -38,10 +38,14 @@
       background: #050108;
     }
 
-    /* GLOBAL DARK BACKGROUND – midnight purple, not hot pink */
+    /* Global background – shared by login + chat */
     body {
       background:
-        radial-gradient(circle at top center, #170029 0%, #080010 40%, #030008 80%, #010004 100%);
+        radial-gradient(circle at bottom center,
+          #3a003b 0%,
+          #140015 40%,
+          #050108 78%,
+          #020006 100%);
     }
 
     canvas#matrix {
@@ -61,14 +65,19 @@
       display: flex;
       justify-content: center;
       align-items: stretch;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      padding: env(safe-area-inset-top)
+               env(safe-area-inset-right)
+               env(safe-area-inset-bottom)
+               env(safe-area-inset-left);
     }
 
     /* -------- LOGIN GATE -------- */
     #loginGate {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at bottom center, rgba(18, 0, 30, 0.96), rgba(3, 0, 8, 0.98));
+      background: radial-gradient(circle at bottom center,
+                  rgba(58, 0, 59, 0.95),
+                  rgba(5, 1, 8, 0.98));
       backdrop-filter: blur(24px);
       display: flex;
       flex-direction: column;
@@ -109,7 +118,7 @@
     .login-input {
       border: none;
       padding: 14px 16px;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 18px;
       color: var(--text-main);
       font-size: 15px;
@@ -147,56 +156,18 @@
 
     /* -------- MAIN CHAT UI -------- */
     .content {
-      display: none;
+      display: none;          /* shown after login */
       flex-direction: column;
       width: 100%;
       height: 100%;
-      padding: 16px 16px 22px;
+      padding: 24px 16px 22px;
       color: var(--text-main);
       background: transparent;
     }
 
-    /* top bar with hamburger + brand */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .top-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .hamburger {
-      width: 28px;
-      height: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-
-    .hamburger span {
-      height: 3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--pink), var(--pink-soft));
-      box-shadow: 0 0 8px var(--pink-glow);
-    }
-
-    .brand {
-      font-family: "Zerowax", system-ui, sans-serif;
-      letter-spacing: 0.16em;
-      font-size: 14px;
-      color: var(--text-main);
-      text-shadow: 0 0 16px rgba(0,0,0,0.9);
-    }
-
-    header.alita-header {
+    .alita-header {
       text-align: center;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .title {
@@ -218,7 +189,7 @@
     }
 
     .bubble-ai {
-      margin: 26px auto 28px;
+      margin: 34px auto 18px;
       max-width: 90%;
       padding: 18px 18px 20px;
       border-radius: 24px;
@@ -238,9 +209,11 @@
       padding: 4px;
       border-radius: 999px;
       background:
-        radial-gradient(circle at top left, rgba(255, 31, 191, 0.35), rgba(0, 0, 0, 0.9));
+        radial-gradient(circle at top left,
+          rgba(255, 31, 191, 0.35),
+          rgba(0, 0, 0, 0.8));
       box-shadow:
-        0 0 22px rgba(0,0,0,0.95),
+        0 0 22px rgba(0,0,0,0.9),
         0 0 30px rgba(255, 31, 191, 0.45);
       backdrop-filter: blur(18px);
     }
@@ -295,91 +268,6 @@
       text-underline-offset: 2px;
     }
 
-    /* ---- HISTORY DRAWER ---- */
-    .history-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 78%;
-      max-width: 320px;
-      background: rgba(3, 0, 8, 0.97);
-      box-shadow: 14px 0 40px rgba(0, 0, 0, 0.95);
-      transform: translateX(-100%);
-      transition: transform 0.25s ease-out;
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      padding: calc(env(safe-area-inset-top, 10px) + 8px) 16px 22px 16px;
-      backdrop-filter: blur(18px);
-    }
-
-    .history-drawer.open {
-      transform: translateX(0);
-    }
-
-    .history-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .history-title {
-      font-family: "Zerowax", system-ui, sans-serif;
-      letter-spacing: 0.12em;
-      font-size: 14px;
-      color: var(--pink-soft);
-    }
-
-    .history-close {
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      font-size: 20px;
-      cursor: pointer;
-    }
-
-    .history-list {
-      margin-top: 8px;
-      overflow-y: auto;
-      padding-right: 4px;
-      flex: 1;
-    }
-
-    .history-item {
-      padding: 10px 8px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      margin-bottom: 7px;
-      font-size: 13px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .history-item span.label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 80%;
-    }
-
-    .history-item button {
-      border: none;
-      background: transparent;
-      color: var(--pink-soft);
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .history-footer {
-      margin-top: 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
     @media (min-width: 768px) {
       .content {
         padding-left: clamp(40px, 20vw, 80px);
@@ -396,28 +284,6 @@
 <body>
   <canvas id="matrix"></canvas>
 
-  <!-- side drawer -->
-  <aside class="history-drawer" id="historyDrawer">
-    <div class="history-header">
-      <div class="history-title">Saved Chats</div>
-      <button class="history-close" id="historyCloseBtn">×</button>
-    </div>
-    <div class="history-list" id="historyList">
-      <div class="history-item">
-        <span class="label">What is OpenWRT?</span>
-        <button title="Delete">⌫</button>
-      </div>
-      <div class="history-item">
-        <span class="label">What car is this</span>
-        <button title="Delete">⌫</button>
-      </div>
-    </div>
-    <div class="history-footer">
-      History list is local-only demo.<br />
-      You can wire it to your node later.
-    </div>
-  </aside>
-
   <div class="app-root">
     <!-- LOGIN GATE -->
     <section id="loginGate">
@@ -433,21 +299,12 @@
 
     <!-- MAIN CHAT UI -->
     <main class="content" id="mainUI">
-      <div class="top-bar">
-        <div class="top-left">
-          <div class="hamburger" id="historyOpenBtn" aria-label="Open history" role="button">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="brand">NEO NODE</div>
-        </div>
-      </div>
-
       <header class="alita-header">
         <div class="title">ALITA</div>
-        <div class="subtitle">ADVANCED Ai ASSISTANT </div>
+        <div class="subtitle">ADVANCED Ai ASSISTANT</div>
       </header>
 
-      <section class="bubble-ai">
+      <section class="bubble-ai" id="alitaGreeting">
         My name is ALITA. How can I assist you today?
       </section>
 
@@ -457,10 +314,175 @@
       </form>
 
       <div class="status">
-        Status: <span class="pill">UI online</span> •
+        Status: <span class="pill">UI online</span> • Backend wiring handled on your node
       </div>
     </main>
   </div>
-  
+
+  <script>
+    /* ========== LOGIN WITH PERSISTENT SESSION ========== */
+
+    const VALID_USER = "neo";
+    const VALID_PASS = "alita";
+
+    const SESSION_DURATION_MS = 12 * 60 * 60 * 1000; // 12 hours
+    const SESSION_KEY = "alita_session_expires_v1";
+
+    const loginGate = document.getElementById("loginGate");
+    const mainUI    = document.getElementById("mainUI");
+    const userInput = document.getElementById("user");
+    const passInput = document.getElementById("pass");
+    const loginBtn  = document.getElementById("loginBtn");
+
+    function showMain() {
+      loginGate.style.display = "none";
+      mainUI.style.display = "flex";
+    }
+
+    function saveSession() {
+      const expiresAt = Date.now() + SESSION_DURATION_MS;
+      localStorage.setItem(SESSION_KEY, String(expiresAt));
+    }
+
+    function hasValidSession() {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return false;
+      const exp = parseInt(raw, 10);
+      if (Number.isNaN(exp)) return false;
+      return Date.now() < exp;
+    }
+
+    // Auto-login if session still valid
+    if (hasValidSession()) {
+      showMain();
+    }
+
+    loginBtn.addEventListener("click", () => {
+      const u = userInput.value.trim().toLowerCase();
+      const p = passInput.value.trim().toLowerCase();
+
+      if (u === VALID_USER && p === VALID_PASS) {
+        saveSession();
+        showMain();
+      } else {
+        passInput.value = "";
+        passInput.placeholder = "Access denied";
+      }
+    });
+
+    passInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loginBtn.click();
+      }
+    });
+
+    /* ========== MATRIX-STYLE NEON CODE RAIN ========== */
+
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    const glyphs = "0 1 0 1 0 1 A L I T A".split(" ");
+    const fontSize = 20;
+    let w, h, columns, drops;
+    let dpr = window.devicePixelRatio || 1;
+
+    function resizeMatrix() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+
+      dpr = window.devicePixelRatio || 1;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      columns = Math.floor(w / fontSize);
+      drops = new Array(columns)
+        .fill(0)
+        .map(() => -Math.random() * (h / fontSize));
+    }
+
+    window.addEventListener("resize", resizeMatrix);
+    resizeMatrix();
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.18)"; // dark trail
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.font = fontSize + "px Zerowax, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.shadowColor = "#ff1fbf";
+      ctx.shadowBlur = 12;
+
+      for (let i = 0; i < columns; i++) {
+        const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+        const x = i * fontSize + fontSize / 2;
+        const y = drops[i] * fontSize;
+
+        ctx.fillStyle = "#ff3ad2";
+        ctx.fillText(text, x, y);
+
+        drops[i] += 0.18 + Math.random() * 0.08;
+
+        if (y > h + fontSize * 10) {
+          drops[i] = -Math.random() * 20;
+        }
+      }
+
+      requestAnimationFrame(drawMatrix);
+    }
+
+    drawMatrix();
+
+    /* ========== N8N INTEGRATION FOR ALITA CHAT ========== */
+
+    const N8N_ENDPOINT = "http://umbrel.local:5678/webhook/Alita";
+
+    const msgForm  = document.getElementById("msgForm");
+    const msgInput = document.getElementById("msgInput");
+    const greetingBubble = document.getElementById("alitaGreeting");
+
+    function appendBubble(text, isUser = false) {
+      const bubble = document.createElement("section");
+      bubble.className = "bubble-ai";
+      bubble.style.background = isUser
+        ? "linear-gradient(135deg, #ff1fbf, #ff5ed5)"
+        : "radial-gradient(circle at top, var(--cyan-soft), var(--cyan))";
+      bubble.style.color = isUser ? "#050108" : "#001018";
+      bubble.textContent = text;
+      greetingBubble.insertAdjacentElement("afterend", bubble);
+    }
+
+    msgForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = msgInput.value.trim();
+      if (!text) return;
+
+      appendBubble(text, true);
+
+      msgInput.value = "";
+      msgInput.disabled = true;
+
+      try {
+        const res = await fetch(N8N_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const json = await res.json().catch(() => ({}));
+        const reply = json.reply || "No response received.";
+        appendBubble(reply, false);
+
+      } catch (err) {
+        appendBubble("⚠️ Connection error. Check your node.", false);
+        console.error(err);
+      }
+
+      msgInput.disabled = false;
+      msgInput.focus();
+    });
+  </script>
 </body>
 </html>
