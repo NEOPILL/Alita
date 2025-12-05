@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <title>ALITA • Neo Node Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000">
 
+  <!-- Font -->
   <style>
     @font-face {
       font-family: "Zerowax";
@@ -13,533 +15,276 @@
     }
 
     :root {
-      --bg-black: #000000;
-
       --pink: #ff1fbf;
       --pink-soft: #ff5ed5;
-      --pink-glow: rgba(255, 31, 191, 0.9);
+      --pink-glow: rgba(255, 31, 191, 0.6);
       --cyan: #00d8ff;
-      --cyan-soft: #42f5ff;
-
-      --text-main: #fdfbff;
-      --text-muted: #b5a9d5;
-
-      --border-radius-xl: 24px;
+      --text-main: #ffffff;
+      --text-muted: #b69ecf;
     }
 
     * {
+      margin: 0; padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      margin: 0;
-      padding: 0;
     }
 
     html, body {
       width: 100%;
       height: 100%;
+      background: #050108;
       overflow: hidden;
-      background: var(--bg-black);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
     }
 
     body {
-      /* faint center glow like the NEO site */
-      background:
-        radial-gradient(circle at center, rgba(255, 31, 191, 0.12) 0, transparent 55%),
-        #000000;
+      background: radial-gradient(circle at top, #2c0032, #050108 70%);
     }
 
-    .app-root {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      overflow: hidden;
-    }
-
-    /* MATRIX PILL CODE */
-    #code-rain {
+    canvas#matrix {
       position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       z-index: 0;
       pointer-events: none;
     }
 
-    .code-vignette {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at center, transparent 0, transparent 45%, rgba(0,0,0,0.7) 100%);
-      mix-blend-mode: screen;
-    }
-
-    /* MAIN LAYER */
-    .content-layer {
+    .app-root {
       position: relative;
       z-index: 2;
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    /* LOGIN GATE */
+    #loginGate {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(22px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      z-index: 6;
+    }
+
+    #loginGate h1 {
+      font-family: "Zerowax";
+      font-size: 44px;
+      color: var(--pink);
+      text-shadow: 0 0 28px var(--pink-glow);
+      letter-spacing: 0.18em;
+    }
+
+    #loginGate p {
+      color: var(--text-muted);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+    }
+
+    .login-box {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 80%;
+      max-width: 360px;
+    }
+
+    .login-input {
+      border: none;
+      padding: 14px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .login-input::placeholder {
+      color: #a088b6;
+    }
+
+    #loginBtn {
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--pink), var(--pink-soft));
+      color: #050108;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      cursor: pointer;
+      box-shadow: 0 0 22px var(--pink-glow);
+    }
+
+    /* MAIN UI */
+    .content {
+      display: none;
+      flex-direction: column;
       width: 100%;
       height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: env(safe-area-inset-top, 8px) clamp(18px, 5vw, 26px)
-               max(env(safe-area-inset-bottom, 0px) + 8px, 14px);
+      padding: 24px 16px;
     }
 
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 4px;
-      padding-bottom: 6px;
-    }
-
-    .top-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .hamburger {
-      width: 28px;
-      height: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-
-    .hamburger span {
-      height: 3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--pink), var(--pink-soft));
-      box-shadow: 0 0 10px var(--pink-glow);
-    }
-
-    .brand {
-      font-family: "Zerowax", system-ui, sans-serif;
-      letter-spacing: 0.16em;
-      font-size: 16px;
-      color: var(--text-main);
-      text-shadow:
-        0 0 16px rgba(0, 0, 0, 0.9),
-        0 0 12px rgba(255, 31, 191, 0.5);
-    }
-
-    .chat-shell {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
-      position: relative;
-      margin-top: 3vh;
-    }
-
-    .alita-header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .alita-title {
-      font-family: "Zerowax", system-ui, sans-serif;
-      font-size: clamp(32px, 7vw, 40px);
+    header .title {
+      font-family: "Zerowax";
+      font-size: 42px;
       letter-spacing: 0.22em;
+      text-align: center;
+      margin-top: 6px;
       color: var(--pink);
-      text-shadow:
-        0 0 30px var(--pink-glow),
-        0 0 12px rgba(0,0,0,0.9);
-      margin-bottom: 6px;
+      text-shadow: 0 0 32px var(--pink-glow);
     }
 
-    .alita-subtitle {
+    .subtitle {
+      text-align: center;
+      margin-top: 4px;
       font-size: 11px;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
+      letter-spacing: 0.28em;
       color: var(--text-muted);
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.95);
     }
 
     .bubble-ai {
-      margin: 26px auto 28px auto;
+      margin: 36px auto;
       max-width: 90%;
-      padding: 16px 18px 18px;
-      border-radius: 22px;
-      background: radial-gradient(circle at top, var(--cyan-soft), var(--cyan));
-      color: #001018;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--cyan), #63f8ff);
+      border-radius: 24px;
+      color: #000b10;
       font-size: 16px;
-      line-height: 1.4;
-      box-shadow:
-        0 0 26px rgba(0, 216, 255, 0.6),
-        0 0 60px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 0 34px rgba(0, 255, 255, .4);
     }
 
-    .input-shell {
+    .inputRow {
       margin-top: auto;
-    }
-
-    .input-row {
       display: flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 2px;
-      background:
-        radial-gradient(circle at top left, rgba(255, 31, 191, 0.4), rgba(0, 0, 0, 0.7)),
-        rgba(0, 0, 0, 0.9);
-      box-shadow:
-        0 0 22px rgba(0,0,0,0.9),
-        0 0 34px rgba(255, 31, 191, 0.45);
+      background: rgba(0,0,0,0.7);
+      border-radius: 50px;
+      box-shadow: 0 0 32px rgba(255,0,200,0.35);
       backdrop-filter: blur(18px);
+      padding: 4px;
     }
 
-    .input-row input {
-      flex: 1;
+    .inputRow input {
       border: none;
+      flex: 1;
+      padding: 14px;
+      color: white;
       background: transparent;
-      color: var(--text-main);
       font-size: 15px;
-      padding: 11px 14px 11px 16px;
-      outline: none;
     }
 
-    .input-row input::placeholder {
-      color: rgba(255, 255, 255, 0.55);
-    }
-
-    .send-button {
+    .inputRow button {
       border: none;
-      outline: none;
-      height: 40px;
-      min-width: 78px;
-      padding: 0 20px;
-      margin: 2px;
-      border-radius: 999px;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 700;
-      cursor: pointer;
-      color: #050108;
       background: linear-gradient(135deg, var(--pink), var(--pink-soft));
-      box-shadow:
-        0 0 22px var(--pink-glow),
-        0 0 40px rgba(0, 0, 0, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .send-button span.icon {
-      font-size: 14px;
-      transform: translateY(1px);
-    }
-
-    .send-button:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow:
-        0 0 12px var(--pink-glow),
-        0 0 26px rgba(0, 0, 0, 0.95);
-    }
-
-    .status-line {
-      margin-top: 10px;
-      font-size: 11px;
-      text-align: center;
-      color: var(--text-muted);
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.85);
-    }
-
-    .status-line .pill {
-      color: var(--pink-soft);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    /* HISTORY DRAWER */
-    .history-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 78%;
-      max-width: 320px;
-      background: rgba(0, 0, 0, 0.96);
-      box-shadow: 14px 0 50px rgba(0, 0, 0, 0.95);
-      transform: translateX(-100%);
-      transition: transform 0.25s ease-out;
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      padding: calc(env(safe-area-inset-top, 10px) + 8px) 16px 22px 16px;
-      backdrop-filter: blur(18px);
-    }
-
-    .history-drawer.open {
-      transform: translateX(0);
-    }
-
-    .history-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .history-title {
-      font-family: "Zerowax", system-ui, sans-serif;
-      letter-spacing: 0.12em;
-      font-size: 14px;
-      color: var(--pink-soft);
-    }
-
-    .history-close {
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      font-size: 20px;
-      cursor: pointer;
-    }
-
-    .history-list {
-      margin-top: 8px;
-      overflow-y: auto;
-      padding-right: 4px;
-      flex: 1;
-    }
-
-    .history-item {
-      padding: 10px 8px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      margin-bottom: 7px;
+      padding: 12px 22px;
+      border-radius: 40px;
       font-size: 13px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .history-item span.label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 80%;
-    }
-
-    .history-item button {
-      border: none;
-      background: transparent;
-      color: var(--pink-soft);
-      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0.18em;
+      color: #050108;
       cursor: pointer;
-    }
-
-    .history-footer {
-      margin-top: 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    @media (min-width: 768px) {
-      .content-layer {
-        padding-left: clamp(40px, 15vw, 80px);
-        padding-right: clamp(40px, 15vw, 80px);
-      }
-
-      .chat-shell {
-        margin-top: 6vh;
-      }
-
-      .bubble-ai {
-        max-width: 70%;
-      }
     }
   </style>
 </head>
+
 <body>
-  <canvas id="code-rain"></canvas>
-  <div class="code-vignette"></div>
+  <canvas id="matrix"></canvas>
 
   <div class="app-root">
-    <!-- History drawer -->
-    <aside class="history-drawer" id="historyDrawer">
-      <div class="history-header">
-        <div class="history-title">Saved Chats</div>
-        <button class="history-close" id="historyCloseBtn">×</button>
-      </div>
-      <div class="history-list" id="historyList">
-        <div class="history-item">
-          <span class="label">What is OpenWRT?</span>
-          <button title="Delete">⌫</button>
-        </div>
-        <div class="history-item">
-          <span class="label">What car is this</span>
-          <button title="Delete">⌫</button>
-        </div>
-      </div>
-      <div class="history-footer">
-        History list is local-only demo.<br />
-        You can wire it to your node later.
-      </div>
-    </aside>
 
-    <!-- Foreground UI -->
-    <div class="content-layer">
-      <header class="top-bar">
-        <div class="top-left">
-          <div class="hamburger" id="historyOpenBtn" aria-label="Open history" role="button">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="brand">NEO NODE</div>
-        </div>
+    <!-- LOGIN GATE -->
+    <div id="loginGate">
+      <h1>ALITA</h1>
+      <p>SECURE ACCESS NODE</p>
+      <div class="login-box">
+        <input id="user" class="login-input" type="text" placeholder="Username" />
+        <input id="pass" class="login-input" type="password" placeholder="Password" />
+        <button id="loginBtn">LOGIN</button>
+      </div>
+    </div>
+
+    <!-- MAIN UI -->
+    <div class="content" id="mainUI">
+      <header>
+        <div class="title">ALITA</div>
+        <div class="subtitle">LOCAL ASSISTANT LINK</div>
       </header>
 
-      <main class="chat-shell">
-        <section class="alita-header">
-          <div class="alita-title">ALITA</div>
-          <div class="alita-subtitle">LOCAL ASSISTANT LINK</div>
-        </section>
+      <section class="bubble-ai">
+        My name is ALITA. How can I assist you today?
+      </section>
 
-        <section class="bubble-ai">
-          My name is ALITA. How can I assist you today?
-        </section>
-
-        <section class="input-shell">
-          <form id="alitaForm" class="input-row" autocomplete="off">
-            <input
-              id="alitaInput"
-              type="text"
-              name="message"
-              placeholder="Message ALITA..."
-              required
-            />
-            <button type="submit" class="send-button">
-              <span>SEND</span>
-              <span class="icon">➤</span>
-            </button>
-          </form>
-          <div class="status-line">
-            Status: <span class="pill">UI online</span> • Backend wiring handled on your node
-          </div>
-        </section>
-      </main>
+      <form class="inputRow" id="msgForm">
+        <input id="msgInput" type="text" placeholder="Message ALITA…" />
+        <button type="submit">SEND</button>
+      </form>
     </div>
   </div>
 
   <script>
-    // -------- MATRIX-STYLE PINK PILL CODE (like NEO site) --------
-    (function () {
-      const canvas = document.getElementById("code-rain");
-      const ctx = canvas.getContext("2d");
+    /* -------- LOGIN ---------- */
+    const VALID_USER = "neo";
+    const VALID_PASS = "alita";
 
-      const glyphs = "01NEOALITA$".split("");
-      const dpr = window.devicePixelRatio || 1;
-      let width = window.innerWidth;
-      let height = window.innerHeight;
-      let fontSize = 18;
-      let columns;
-      let drops = [];
-      let speeds = [];
+    document.getElementById("loginBtn").onclick = () => {
+      const u = user.value.trim().toLowerCase();
+      const p = pass.value.trim().toLowerCase();
 
-      function init() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        fontSize = Math.max(14, Math.min(22, Math.floor(width / 40)));
-        columns = Math.floor(width / fontSize);
-        drops = [];
-        speeds = [];
-
-        for (let i = 0; i < columns; i++) {
-          drops[i] = Math.random() * -20;
-          // Slightly different speed per column
-          speeds[i] = 0.4 + Math.random() * 0.4;
-        }
+      if (u === VALID_USER && p === VALID_PASS) {
+        loginGate.style.display = "none";
+        mainUI.style.display = "flex";
+      } else {
+        pass.value = "";
+        pass.placeholder = "Access Denied";
       }
+    };
 
-      window.addEventListener("resize", init);
-      init();
+    /* -------- MATRIX CODE RAIN ---------- */
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
 
-      function draw() {
-        // darker fade to keep solid trails
-        ctx.fillStyle = "rgba(0,0,0,0.22)";
-        ctx.fillRect(0, 0, width, height);
+    const glyphs = "A L I T A 0 1 $".split(" ");
+    const fontSize = 20;
+    let w, h, cols, drops;
 
-        ctx.font = fontSize + "px Zerowax, monospace";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = "#ff33ff";
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      cols = Math.floor(w / fontSize);
+      drops = Array(cols).fill(-10);
+    }
+    resize();
+    window.onresize = resize;
 
-        for (let i = 0; i < columns; i++) {
-          const char = glyphs[Math.floor(Math.random() * glyphs.length)];
-          const x = i * fontSize + fontSize / 2;
-          const y = drops[i] * fontSize;
+    function draw() {
+      ctx.fillStyle = "rgba(5,0,10,0.2)";
+      ctx.fillRect(0, 0, w, h);
 
-          ctx.fillStyle = "#ff33ff";
-          ctx.fillText(char, x, y);
+      ctx.font = fontSize + "px Zerowax, monospace";
+      ctx.shadowColor = "#ff1fbf";
+      ctx.shadowBlur = 12;
+      ctx.textAlign = "center";
 
-          drops[i] += speeds[i];
+      drops.forEach((y, i) => {
+        const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+        const x = i * fontSize + fontSize / 2;
+        ctx.fillStyle = "#ff4ee6";
+        ctx.fillText(text, x, y * fontSize);
 
-          // reset column when it's off screen
-          if (y > height + fontSize * 2 || Math.random() > 0.995) {
-            drops[i] = Math.random() * -20;
-            speeds[i] = 0.4 + Math.random() * 0.4;
-          }
-        }
+        drops[i] += 0.12 + Math.random() * 0.05; // SLOW FALL
 
-        requestAnimationFrame(draw);
-      }
-
-      draw();
-    })();
-
-    // -------- History drawer toggle --------
-    (function () {
-      const drawer = document.getElementById("historyDrawer");
-      const openBtn = document.getElementById("historyOpenBtn");
-      const closeBtn = document.getElementById("historyCloseBtn");
-
-      function openDrawer() {
-        drawer.classList.add("open");
-      }
-      function closeDrawer() {
-        drawer.classList.remove("open");
-      }
-
-      openBtn.addEventListener("click", openDrawer);
-      closeBtn.addEventListener("click", closeDrawer);
-
-      // Clicking on dim background (if we ever add one)
-      drawer.addEventListener("click", (e) => {
-        if (e.target === drawer) closeDrawer();
+        if (y * fontSize > h + 80) drops[i] = -8;
       });
-    })();
 
-    // -------- Form handler stub --------
-    (function () {
-      const form = document.getElementById("alitaForm");
-      const input = document.getElementById("alitaInput");
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const msg = input.value.trim();
-        if (!msg) return;
-        console.log("Message to ALITA:", msg);
-        input.value = "";
-      });
-    })();
+      requestAnimationFrame(draw);
+    }
+    draw();
   </script>
+
 </body>
 </html>
