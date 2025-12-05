@@ -38,10 +38,15 @@
       background: #050108;
     }
 
-    /* Global background – same for login + chat */
+    /* GLOBAL BACKGROUND — SAME FOR LOGIN + CHAT */
     body {
-      background:
-        radial-gradient(circle at bottom center, #3a003b 0%, #140015 40%, #050108 78%, #020006 100%);
+      background: radial-gradient(
+        circle at bottom center,
+        #3a003b 0%,
+        #140015 40%,
+        #050108 78%,
+        #020006 100%
+      );
     }
 
     canvas#matrix {
@@ -61,14 +66,18 @@
       display: flex;
       justify-content: center;
       align-items: stretch;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      padding: env(safe-area-inset-top)
+              env(safe-area-inset-right)
+              env(safe-area-inset-bottom)
+              env(safe-area-inset-left);
     }
 
-    /* -------- LOGIN GATE -------- */
+    /* ---------- LOGIN LAYER ---------- */
+
     #loginGate {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at bottom center, rgba(58, 0, 59, 0.95), rgba(5, 1, 8, 0.98));
+      background: radial-gradient(circle at bottom center, rgba(58,0,59,0.95), rgba(5,1,8,0.98));
       backdrop-filter: blur(24px);
       display: flex;
       flex-direction: column;
@@ -84,9 +93,7 @@
       font-size: 44px;
       color: var(--pink);
       letter-spacing: 0.22em;
-      text-shadow:
-        0 0 28px var(--pink-glow),
-        0 0 8px rgba(0,0,0,0.9);
+      text-shadow: 0 0 28px var(--pink-glow), 0 0 8px rgba(0,0,0,0.9);
     }
 
     #loginGate p {
@@ -103,24 +110,19 @@
       gap: 14px;
       width: 100%;
       max-width: 400px;
-      margin-top: 10px;
     }
 
     .login-input {
       border: none;
       padding: 14px 16px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0,0,0,0.7);
       border-radius: 18px;
       color: var(--text-main);
       font-size: 15px;
-      outline: none;
       box-shadow:
-        0 0 24px rgba(0, 0, 0, 0.9),
-        0 0 26px rgba(0, 0, 0, 0.7);
-    }
-
-    .login-input::placeholder {
-      color: #8f7aa7;
+        0 0 24px rgba(0,0,0,0.9),
+        0 0 26px rgba(0,0,0,0.7);
+      outline: none;
     }
 
     #loginBtn {
@@ -133,19 +135,11 @@
       font-size: 14px;
       letter-spacing: 0.18em;
       cursor: pointer;
-      box-shadow:
-        0 0 28px var(--pink-glow),
-        0 0 40px rgba(0,0,0,0.8);
+      box-shadow: 0 0 28px var(--pink-glow), 0 0 40px rgba(0,0,0,0.8);
     }
 
-    #loginBtn:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow:
-        0 0 18px var(--pink-glow),
-        0 0 26px rgba(0,0,0,0.9);
-    }
+    /* ---------- CHAT UI ---------- */
 
-    /* -------- MAIN CHAT UI -------- */
     .content {
       display: none;
       flex-direction: column;
@@ -153,13 +147,11 @@
       height: 100%;
       padding: 24px 16px 22px;
       color: var(--text-main);
-      /* transparent so we see same global background as login */
       background: transparent;
     }
 
     header {
       text-align: center;
-      margin-top: 4px;
     }
 
     .title {
@@ -167,31 +159,26 @@
       font-size: 40px;
       letter-spacing: 0.22em;
       color: var(--pink);
-      text-shadow:
-        0 0 32px var(--pink-glow),
-        0 0 10px rgba(0,0,0,0.9);
-      margin-bottom: 4px;
+      text-shadow: 0 0 32px var(--pink-glow), 0 0 10px rgba(0,0,0,0.9);
     }
 
     .subtitle {
       font-size: 11px;
       letter-spacing: 0.26em;
-      text-transform: uppercase;
       color: var(--text-muted);
+      text-transform: uppercase;
     }
 
     .bubble-ai {
       margin: 34px auto 28px;
       max-width: 90%;
-      padding: 18px 18px 20px;
+      padding: 18px;
       border-radius: 24px;
       background: radial-gradient(circle at top, var(--cyan-soft), var(--cyan));
       color: #001018;
       font-size: 16px;
       line-height: 1.4;
-      box-shadow:
-        0 0 26px rgba(0, 216, 255, 0.55),
-        0 0 60px rgba(0,0,0,0.9);
+      box-shadow: 0 0 26px rgba(0,216,255,0.55), 0 0 60px rgba(0,0,0,0.9);
     }
 
     .inputRow {
@@ -200,31 +187,23 @@
       align-items: center;
       padding: 4px;
       border-radius: 999px;
-      background:
-        radial-gradient(circle at top left, rgba(255, 31, 191, 0.35), rgba(0, 0, 0, 0.8));
-      box-shadow:
-        0 0 22px rgba(0,0,0,0.9),
-        0 0 30px rgba(255, 31, 191, 0.45);
+      background: radial-gradient(circle at top left, rgba(255,31,191,0.35), rgba(0,0,0,0.8));
+      box-shadow: 0 0 22px rgba(0,0,0,0.9), 0 0 30px rgba(255,31,191,0.45);
       backdrop-filter: blur(18px);
     }
 
     .inputRow input {
       flex: 1;
+      background: transparent;
       border: none;
       outline: none;
-      background: transparent;
-      padding: 12px 14px 12px 16px;
+      padding: 12px 16px;
       color: var(--text-main);
       font-size: 15px;
     }
 
-    .inputRow input::placeholder {
-      color: rgba(255, 255, 255, 0.55);
-    }
-
     .inputRow button {
       border: none;
-      outline: none;
       padding: 10px 22px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--pink), var(--pink-soft));
@@ -233,16 +212,6 @@
       font-size: 12px;
       letter-spacing: 0.18em;
       cursor: pointer;
-      box-shadow:
-        0 0 22px var(--pink-glow),
-        0 0 38px rgba(0,0,0,0.85);
-    }
-
-    .inputRow button:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow:
-        0 0 14px var(--pink-glow),
-        0 0 26px rgba(0,0,0,0.9);
     }
 
     .status {
@@ -251,23 +220,6 @@
       text-align: center;
       color: var(--text-muted);
     }
-
-    .status .pill {
-      color: var(--pink-soft);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    @media (min-width: 768px) {
-      .content {
-        padding-left: clamp(40px, 20vw, 80px);
-        padding-right: clamp(40px, 20vw, 80px);
-      }
-
-      .bubble-ai {
-        max-width: 70%;
-      }
-    }
   </style>
 </head>
 
@@ -275,19 +227,19 @@
   <canvas id="matrix"></canvas>
 
   <div class="app-root">
-    <!-- LOGIN GATE -->
+
+    <!-- LOGIN -->
     <section id="loginGate">
       <h1>ALITA</h1>
       <p>SECURE ACCESS NODE</p>
-
       <div class="login-box">
-        <input id="user" class="login-input" type="text" placeholder="Username" autocomplete="username" />
-        <input id="pass" class="login-input" type="password" placeholder="Password" autocomplete="current-password" />
+        <input id="user" class="login-input" type="text" placeholder="Username" />
+        <input id="pass" class="login-input" type="password" placeholder="Password" />
         <button id="loginBtn">LOGIN</button>
       </div>
     </section>
 
-    <!-- MAIN CHAT UI -->
+    <!-- CHAT -->
     <main class="content" id="mainUI">
       <header>
         <div class="title">ALITA</div>
@@ -298,7 +250,7 @@
         My name is ALITA. How can I assist you today?
       </section>
 
-      <form class="inputRow" id="msgForm" autocomplete="off">
+      <form class="inputRow" id="msgForm">
         <input id="msgInput" type="text" placeholder="Message ALITA…" />
         <button type="submit">SEND</button>
       </form>
@@ -309,131 +261,76 @@
     </main>
   </div>
 
-  <script>
-    /* ========== LOGIN WITH PERSISTENT SESSION ========== */
+<script>
+/* ========== LOGIN PERSISTENCE ========== */
+const VALID_USER = "neo";
+const VALID_PASS = "alita";
+const SESSION_KEY = "alita_session_exp";
+const SESSION_MS = 12 * 60 * 60 * 1000;
 
-    // Change these if you want different creds
-    const VALID_USER = "neo";
-    const VALID_PASS = "alita";
+function showMain() {
+  loginGate.style.display = "none";
+  mainUI.style.display = "flex";
+}
 
-    // 12-hour session (in ms). Change if you want longer/shorter.
-    const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
-    const SESSION_KEY = "alita_session_expires_v1";
+if (+localStorage.getItem(SESSION_KEY) > Date.now()) {
+  showMain();
+}
 
-    const loginGate = document.getElementById("loginGate");
-    const mainUI    = document.getElementById("mainUI");
-    const userInput = document.getElementById("user");
-    const passInput = document.getElementById("pass");
-    const loginBtn  = document.getElementById("loginBtn");
+loginBtn.onclick = () => {
+  if (user.value.toLowerCase() === VALID_USER && pass.value.toLowerCase() === VALID_PASS) {
+    localStorage.setItem(SESSION_KEY, Date.now() + SESSION_MS);
+    showMain();
+  } else pass.value = "";
+};
 
-    function showMain() {
-      loginGate.style.display = "none";
-      mainUI.style.display = "flex";
-    }
+/* ========== MATRIX CODE (FIXED TRAIL COLOR) ========== */
 
-    function saveSession() {
-      const expiresAt = Date.now() + SESSION_DURATION_MS;
-      localStorage.setItem(SESSION_KEY, String(expiresAt));
-    }
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+const glyphs = "0 1 A L I T A $".split(" ");
+const fontSize = 20;
+let w, h, cols, drops;
 
-    function hasValidSession() {
-      const raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return false;
-      const exp = parseInt(raw, 10);
-      if (Number.isNaN(exp)) return false;
-      return Date.now() < exp;
-    }
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+  cols = Math.floor(w / fontSize);
+  drops = Array(cols).fill(-10);
+}
+window.onresize = resize;
+resize();
 
-    // Auto-login on page load if session still valid
-    if (hasValidSession()) {
-      showMain();
-    }
+function draw() {
+  /** 🚀 HERE IS THE FIX — BLACK TRAIL, NO PINK TINT **/
+  ctx.fillStyle = "rgba(0,0,0,0.22)";
+  ctx.fillRect(0, 0, w, h);
 
-    loginBtn.addEventListener("click", () => {
-      const u = userInput.value.trim().toLowerCase();
-      const p = passInput.value.trim().toLowerCase();
+  ctx.font = fontSize + "px Zerowax, monospace";
+  ctx.shadowColor = "#ff1fbf";
+  ctx.shadowBlur = 14;
+  ctx.textAlign = "center";
 
-      if (u === VALID_USER && p === VALID_PASS) {
-        saveSession();
-        showMain();
-      } else {
-        passInput.value = "";
-        passInput.placeholder = "Access denied";
-      }
-    });
+  for (let i = 0; i < cols; i++) {
+    const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+    const x = i * fontSize + fontSize / 2;
+    const y = drops[i] * fontSize;
 
-    // Allow pressing Enter on password field to login
-    passInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        loginBtn.click();
-      }
-    });
+    ctx.fillStyle = "#ff4ee6";
+    ctx.fillText(text, x, y);
 
-    /* ========== MATRIX-STYLE NEON CODE RAIN ========== */
+    drops[i] += 0.09 + Math.random() * 0.03;
 
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-    const glyphs = "0 1 A L I T A $".split(" ");
-    const fontSize = 20;
-    let w, h, columns, drops;
+    if (y > h + fontSize * 2) drops[i] = -10;
+  }
 
-    function resizeMatrix() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-      columns = Math.floor(w / fontSize);
-      drops = Array(columns).fill(-10).map(d => d - Math.random() * 20);
-    }
+  requestAnimationFrame(draw);
+}
+draw();
 
-    window.addEventListener("resize", resizeMatrix);
-    resizeMatrix();
+/* ========== MESSAGE STUB ========== */
+msgForm.onsubmit = e => { e.preventDefault(); msgInput.value = ""; };
 
-    function drawMatrix() {
-      // slightly translucent to keep trails
-      ctx.fillStyle = "rgba(5, 0, 10, 0.22)";
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.font = fontSize + "px Zerowax, monospace";
-      ctx.textAlign = "center";
-      ctx.shadowColor = "#ff1fbf";
-      ctx.shadowBlur = 14;
-
-      for (let i = 0; i < columns; i++) {
-        const text = glyphs[Math.floor(Math.random() * glyphs.length)];
-        const x = i * fontSize + fontSize / 2;
-        const y = drops[i] * fontSize;
-
-        ctx.fillStyle = "#ff4ee6";
-        ctx.fillText(text, x, y);
-
-        // Slow, smooth fall
-        drops[i] += 0.12 + Math.random() * 0.05;
-
-        if (y > h + fontSize * 2) {
-          drops[i] = -10 - Math.random() * 20;
-        }
-      }
-
-      requestAnimationFrame(drawMatrix);
-    }
-
-    drawMatrix();
-
-    /* ========== MESSAGE FORM STUB ========== */
-
-    const msgForm = document.getElementById("msgForm");
-    const msgInput = document.getElementById("msgInput");
-
-    msgForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = msgInput.value.trim();
-      if (!text) return;
-
-      // Hook this up to your n8n / local endpoint later.
-      console.log("Message to ALITA:", text);
-
-      msgInput.value = "";
-    });
-  </script>
+</script>
 </body>
 </html>
