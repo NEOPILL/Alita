@@ -1,538 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>ALITA • Neo Node Assistant</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<script>
+(function () {
+  const canvas = document.getElementById('code-rain');
+  const ctx = canvas.getContext('2d');
 
-  <!-- Font -->
-  <style>
-    @font-face {
-      font-family: "Zerowax";
-      src: url("assets/Zerowax.otf") format("opentype");
-      font-display: swap;
-    }
+  let w = window.innerWidth;
+  let h = window.innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
 
-    :root {
-      --bg-dark: #050108;
-      --bg-gradient-top: #050108;
-      --bg-gradient-mid: #160016;
-      --bg-gradient-bottom: #050108;
+  // Neon glyphs
+  const glyphs = "ALITA$01NE".split("");
+  const fontSize = 22;
+  let columns = Math.floor(w / fontSize);
 
-      --pink: #ff1fbf;
-      --pink-soft: #ff5ed5;
-      --pink-glow: rgba(255, 31, 191, 0.6);
-      --cyan: #00d8ff;
-      --cyan-soft: #42f5ff;
-      --text-main: #fdfbff;
-      --text-muted: #bbb2d0;
-      --bubble-bg: rgba(0, 0, 0, 0.85);
-      --border-radius-xl: 24px;
-      --shadow-strong: 0 0 40px rgba(255, 31, 191, 0.6);
-    }
+  const drops = Array(columns).fill(0).map(() => Math.random() * -100);
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+  function resize() {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    columns = Math.floor(w / fontSize);
+    drops.length = columns;
+    for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+  }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-      overflow: hidden;
-    }
+  window.addEventListener('resize', resize);
 
-    body {
-      background: radial-gradient(circle at top left, #130016 0%, #050108 55%, #000 100%);
-    }
+  function draw() {
+    // Dark trail for smooth matrix fade
+    ctx.fillStyle = "rgba(0,0,0,0.12)";
+    ctx.fillRect(0, 0, w, h);
 
-    .app-root {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      overflow: hidden;
-    }
+    ctx.font = fontSize + "px Zerowax, monospace";
+    ctx.textAlign = "center";
+    ctx.shadowColor = "#ff009d";
+    ctx.shadowBlur = 18;
 
-    /* Falling code canvas */
-    #code-rain {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      filter: blur(0.5px);
-    }
+    for (let i = 0; i < columns; i++) {
+      const char = glyphs[Math.floor(Math.random() * glyphs.length)];
+      const x = i * fontSize + fontSize / 2;
+      const y = drops[i] * fontSize;
 
-    /* Main layout */
-    .content-layer {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 0 clamp(18px, 5vw, 26px);
-      padding-top: 12px;
-      padding-bottom: 18px;
-    }
+      ctx.fillStyle = "#ff35cf"; // Neon pink
+      ctx.fillText(char, x, y);
 
-    /* Top bar */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 6px;
-      padding-bottom: 6px;
-    }
+      // Slow, smooth scroll
+      drops[i] += 0.28;
 
-    .top-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .hamburger {
-      width: 28px;
-      height: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-
-    .hamburger span {
-      height: 3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--pink), var(--pink-soft));
-      box-shadow: 0 0 8px var(--pink-glow);
-    }
-
-    .brand {
-      font-family: "Zerowax", system-ui, sans-serif;
-      letter-spacing: 0.16em;
-      font-size: 16px;
-      color: var(--text-main);
-      text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
-    }
-
-    /* Chat panel */
-    .chat-shell {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
-      position: relative;
-      margin-top: 4vh;
-    }
-
-    .alita-header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .alita-title {
-      font-family: "Zerowax", system-ui, sans-serif;
-      font-size: clamp(32px, 7vw, 40px);
-      letter-spacing: 0.22em;
-      color: var(--pink);
-      text-shadow:
-        0 0 30px var(--pink-glow),
-        0 0 10px rgba(0,0,0,0.8);
-      margin-bottom: 8px;
-    }
-
-    .alita-subtitle {
-      font-size: 11px;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.95);
-    }
-
-    .bubble-ai {
-      margin: 24px auto 28px auto;
-      max-width: 90%;
-      padding: 16px 16px 18px;
-      border-radius: 22px;
-      background: radial-gradient(circle at top, var(--cyan-soft), var(--cyan));
-      color: #001018;
-      font-size: 16px;
-      line-height: 1.4;
-      box-shadow:
-        0 0 24px rgba(0, 216, 255, 0.5),
-        0 0 60px rgba(0, 0, 0, 0.9);
-    }
-
-    /* Input row */
-    .input-shell {
-      margin-top: auto;
-      padding-bottom: 4px;
-    }
-
-    .input-row {
-      display: flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 2px;
-      background:
-        radial-gradient(circle at top left, rgba(255, 31, 191, 0.4), rgba(0, 0, 0, 0.6)),
-        rgba(0, 0, 0, 0.85);
-      box-shadow:
-        0 0 18px rgba(0,0,0,0.9),
-        0 0 30px rgba(255, 31, 191, 0.4);
-      backdrop-filter: blur(18px);
-    }
-
-    .input-row input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      font-size: 15px;
-      padding: 10px 14px 10px 16px;
-      outline: none;
-    }
-
-    .input-row input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .send-button {
-      border: none;
-      outline: none;
-      height: 38px;
-      min-width: 70px;
-      padding: 0 18px;
-      margin: 2px;
-      border-radius: 999px;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 700;
-      cursor: pointer;
-      color: #050108;
-      background: linear-gradient(135deg, var(--pink), var(--pink-soft));
-      box-shadow:
-        0 0 22px var(--pink-glow),
-        0 0 40px rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .send-button span.icon {
-      font-size: 14px;
-      transform: translateY(1px);
-    }
-
-    .send-button:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow:
-        0 0 12px var(--pink-glow),
-        0 0 26px rgba(0, 0, 0, 0.9);
-    }
-
-    .status-line {
-      margin-top: 10px;
-      font-size: 11px;
-      text-align: center;
-      color: var(--text-muted);
-      text-shadow: 0 0 12px rgba(0, 0, 0, 0.85);
-    }
-
-    .status-line .pill {
-      color: var(--pink-soft);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    /* Slide-out history drawer */
-    .history-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 78%;
-      max-width: 320px;
-      background: rgba(5, 1, 8, 0.97);
-      box-shadow: 12px 0 40px rgba(0, 0, 0, 0.9);
-      transform: translateX(-100%);
-      transition: transform 0.25s ease-out;
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      padding: 18px 14px 24px 16px;
-      backdrop-filter: blur(16px);
-    }
-
-    .history-drawer.open {
-      transform: translateX(0);
-    }
-
-    .history-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .history-title {
-      font-family: "Zerowax", system-ui, sans-serif;
-      letter-spacing: 0.12em;
-      font-size: 14px;
-      color: var(--pink-soft);
-    }
-
-    .history-close {
-      border: none;
-      background: transparent;
-      color: var(--text-main);
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .history-list {
-      margin-top: 8px;
-      overflow-y: auto;
-      padding-right: 4px;
-      flex: 1;
-    }
-
-    .history-item {
-      padding: 10px 8px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
-      margin-bottom: 6px;
-      font-size: 13px;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .history-item span.label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 80%;
-    }
-
-    .history-item button {
-      border: none;
-      background: transparent;
-      color: var(--pink-soft);
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .history-footer {
-      margin-top: 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    /* Small screens adjustments */
-    @media (min-width: 768px) {
-      .content-layer {
-        padding-left: clamp(40px, 15vw, 80px);
-        padding-right: clamp(40px, 15vw, 80px);
-      }
-
-      .chat-shell {
-        margin-top: 6vh;
-      }
-
-      .bubble-ai {
-        max-width: 70%;
+      // Reset stream after passing screen
+      if (y > h + fontSize * 2) {
+        drops[i] = Math.random() * -60;
       }
     }
-  </style>
-</head>
-<body>
-  <canvas id="code-rain"></canvas>
 
-  <div class="app-root">
-    <!-- History drawer -->
-    <aside class="history-drawer" id="historyDrawer">
-      <div class="history-header">
-        <div class="history-title">Saved Chats</div>
-        <button class="history-close" id="historyCloseBtn">×</button>
-      </div>
-      <div class="history-list" id="historyList">
-        <!-- Demo items; you can wire this to n8n/localStorage later -->
-        <div class="history-item">
-          <span class="label">What is OpenWRT?</span>
-          <button title="Delete">⌫</button>
-        </div>
-        <div class="history-item">
-          <span class="label">What car is this</span>
-          <button title="Delete">⌫</button>
-        </div>
-      </div>
-      <div class="history-footer">
-        History list is local-only demo.<br />
-        You can wire it to your node later.
-      </div>
-    </aside>
+    requestAnimationFrame(draw);
+  }
 
-    <!-- Foreground UI -->
-    <div class="content-layer">
-      <header class="top-bar">
-        <div class="top-left">
-          <div class="hamburger" id="historyOpenBtn" aria-label="Open history" role="button">
-            <span></span><span></span><span></span>
-          </div>
-          <div class="brand">NEO NODE</div>
-        </div>
-      </header>
-
-      <main class="chat-shell">
-        <section class="alita-header">
-          <div class="alita-title">ALITA</div>
-          <div class="alita-subtitle">LOCAL ASSISTANT LINK</div>
-        </section>
-
-        <section class="bubble-ai">
-          My name is ALITA. How can I assist you today?
-        </section>
-
-        <section class="input-shell">
-          <form id="alitaForm" class="input-row" autocomplete="off">
-            <input
-              id="alitaInput"
-              type="text"
-              name="message"
-              placeholder="Message ALITA..."
-              required
-            />
-            <button type="submit" class="send-button">
-              <span>SEND</span>
-              <span class="icon">➤</span>
-            </button>
-          </form>
-          <div class="status-line">
-            Status: <span class="pill">UI online</span> • Backend wiring handled on your node
-          </div>
-        </section>
-      </main>
-    </div>
-  </div>
-
-  <script>
-    // ---------- Falling neon code ----------
-    (function () {
-      const canvas = document.getElementById('code-rain');
-      const ctx = canvas.getContext('2d');
-
-      let width = window.innerWidth;
-      let height = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
-
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-
-      const glyphs = 'AL1T0NE$✦'.split('');
-      const fontSize = 18;
-      let columns = Math.floor(width / fontSize);
-      const drops = [];
-      for (let i = 0; i < columns; i++) {
-        drops[i] = Math.random() * -20;
-      }
-
-      function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        columns = Math.floor(width / fontSize);
-      }
-
-      window.addEventListener('resize', resize);
-
-      function draw() {
-        // translucent black for trail
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.font = fontSize + 'px Zerowax, monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.shadowColor = '#ff1fbf';
-        ctx.shadowBlur = 14;
-
-        for (let i = 0; i < columns; i++) {
-          const text = glyphs[Math.floor(Math.random() * glyphs.length)];
-          const x = i * fontSize + fontSize / 2;
-          const y = drops[i] * fontSize;
-
-          ctx.fillStyle = '#ff3ad2';
-          ctx.fillText(text, x, y);
-
-          // Slow fall
-          drops[i] += 0.15 + Math.random() * 0.08;
-
-          if (y > height + fontSize * 2) {
-            drops[i] = Math.random() * -20;
-          }
-        }
-
-        requestAnimationFrame(draw);
-      }
-
-      draw();
-    })();
-
-    // ---------- History drawer toggle ----------
-    (function () {
-      const drawer = document.getElementById('historyDrawer');
-      const openBtn = document.getElementById('historyOpenBtn');
-      const closeBtn = document.getElementById('historyCloseBtn');
-
-      function openDrawer() {
-        drawer.classList.add('open');
-      }
-      function closeDrawer() {
-        drawer.classList.remove('open');
-      }
-
-      openBtn.addEventListener('click', openDrawer);
-      closeBtn.addEventListener('click', closeDrawer);
-
-      drawer.addEventListener('click', (e) => {
-        if (e.target === drawer) closeDrawer();
-      });
-    })();
-
-    // ---------- Form handler stub ----------
-    (function () {
-      const form = document.getElementById('alitaForm');
-      const input = document.getElementById('alitaInput');
-
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const msg = input.value.trim();
-        if (!msg) return;
-
-        // This is where you wire to your n8n / local endpoint.
-        console.log('Message to ALITA:', msg);
-
-        input.value = '';
-      });
-    })();
-  </script>
-</body>
-</html>
+  draw();
+})();
+</script>
