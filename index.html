@@ -5,7 +5,6 @@
   <title>ALITA • Neo Node Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- Font -->
   <style>
     @font-face {
       font-family: "Zerowax";
@@ -14,41 +13,41 @@
     }
 
     :root {
-      --bg-dark: #050108;
-      --bg-gradient-top: #050108;
-      --bg-gradient-mid: #160016;
-      --bg-gradient-bottom: #050108;
+      --bg-black: #000000;
 
       --pink: #ff1fbf;
       --pink-soft: #ff5ed5;
-      --pink-glow: rgba(255, 31, 191, 0.6);
+      --pink-glow: rgba(255, 31, 191, 0.9);
       --cyan: #00d8ff;
       --cyan-soft: #42f5ff;
+
       --text-main: #fdfbff;
-      --text-muted: #bbb2d0;
-      --bubble-bg: rgba(0, 0, 0, 0.85);
+      --text-muted: #b5a9d5;
+
       --border-radius-xl: 24px;
-      --shadow-strong: 0 0 40px rgba(255, 31, 191, 0.6);
     }
 
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
     }
 
     html, body {
-      margin: 0;
-      padding: 0;
       width: 100%;
       height: 100%;
-      background: #000;
+      overflow: hidden;
+      background: var(--bg-black);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-      overflow: hidden;
     }
 
     body {
-      background: radial-gradient(circle at top left, #130016 0%, #050108 55%, #000 100%);
+      /* faint center glow like the NEO site */
+      background:
+        radial-gradient(circle at center, rgba(255, 31, 191, 0.12) 0, transparent 55%),
+        #000000;
     }
 
     .app-root {
@@ -62,7 +61,7 @@
       overflow: hidden;
     }
 
-    /* Falling code canvas */
+    /* MATRIX PILL CODE */
     #code-rain {
       position: fixed;
       inset: 0;
@@ -70,10 +69,19 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
-      filter: blur(0.5px);
     }
 
-    /* Main layout */
+    .code-vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at center, transparent 0, transparent 45%, rgba(0,0,0,0.7) 100%);
+      mix-blend-mode: screen;
+    }
+
+    /* MAIN LAYER */
     .content-layer {
       position: relative;
       z-index: 2;
@@ -81,17 +89,15 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 0 clamp(18px, 5vw, 26px);
-      padding-top: 12px;
-      padding-bottom: 18px;
+      padding: env(safe-area-inset-top, 8px) clamp(18px, 5vw, 26px)
+               max(env(safe-area-inset-bottom, 0px) + 8px, 14px);
     }
 
-    /* Top bar */
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 6px;
+      padding-top: 4px;
       padding-bottom: 6px;
     }
 
@@ -114,7 +120,7 @@
       height: 3px;
       border-radius: 999px;
       background: linear-gradient(90deg, var(--pink), var(--pink-soft));
-      box-shadow: 0 0 8px var(--pink-glow);
+      box-shadow: 0 0 10px var(--pink-glow);
     }
 
     .brand {
@@ -122,10 +128,11 @@
       letter-spacing: 0.16em;
       font-size: 16px;
       color: var(--text-main);
-      text-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
+      text-shadow:
+        0 0 16px rgba(0, 0, 0, 0.9),
+        0 0 12px rgba(255, 31, 191, 0.5);
     }
 
-    /* Chat panel */
     .chat-shell {
       flex: 1;
       display: flex;
@@ -133,7 +140,7 @@
       justify-content: flex-start;
       align-items: stretch;
       position: relative;
-      margin-top: 4vh;
+      margin-top: 3vh;
     }
 
     .alita-header {
@@ -148,8 +155,8 @@
       color: var(--pink);
       text-shadow:
         0 0 30px var(--pink-glow),
-        0 0 10px rgba(0,0,0,0.8);
-      margin-bottom: 8px;
+        0 0 12px rgba(0,0,0,0.9);
+      margin-bottom: 6px;
     }
 
     .alita-subtitle {
@@ -161,23 +168,21 @@
     }
 
     .bubble-ai {
-      margin: 24px auto 28px auto;
+      margin: 26px auto 28px auto;
       max-width: 90%;
-      padding: 16px 16px 18px;
+      padding: 16px 18px 18px;
       border-radius: 22px;
       background: radial-gradient(circle at top, var(--cyan-soft), var(--cyan));
       color: #001018;
       font-size: 16px;
       line-height: 1.4;
       box-shadow:
-        0 0 24px rgba(0, 216, 255, 0.5),
+        0 0 26px rgba(0, 216, 255, 0.6),
         0 0 60px rgba(0, 0, 0, 0.9);
     }
 
-    /* Input row */
     .input-shell {
       margin-top: auto;
-      padding-bottom: 4px;
     }
 
     .input-row {
@@ -186,11 +191,11 @@
       border-radius: 999px;
       padding: 2px;
       background:
-        radial-gradient(circle at top left, rgba(255, 31, 191, 0.4), rgba(0, 0, 0, 0.6)),
-        rgba(0, 0, 0, 0.85);
+        radial-gradient(circle at top left, rgba(255, 31, 191, 0.4), rgba(0, 0, 0, 0.7)),
+        rgba(0, 0, 0, 0.9);
       box-shadow:
-        0 0 18px rgba(0,0,0,0.9),
-        0 0 30px rgba(255, 31, 191, 0.4);
+        0 0 22px rgba(0,0,0,0.9),
+        0 0 34px rgba(255, 31, 191, 0.45);
       backdrop-filter: blur(18px);
     }
 
@@ -200,20 +205,20 @@
       background: transparent;
       color: var(--text-main);
       font-size: 15px;
-      padding: 10px 14px 10px 16px;
+      padding: 11px 14px 11px 16px;
       outline: none;
     }
 
     .input-row input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.55);
     }
 
     .send-button {
       border: none;
       outline: none;
-      height: 38px;
-      min-width: 70px;
-      padding: 0 18px;
+      height: 40px;
+      min-width: 78px;
+      padding: 0 20px;
       margin: 2px;
       border-radius: 999px;
       font-size: 13px;
@@ -225,7 +230,7 @@
       background: linear-gradient(135deg, var(--pink), var(--pink-soft));
       box-shadow:
         0 0 22px var(--pink-glow),
-        0 0 40px rgba(0, 0, 0, 0.8);
+        0 0 40px rgba(0, 0, 0, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -241,7 +246,7 @@
       transform: translateY(1px) scale(0.99);
       box-shadow:
         0 0 12px var(--pink-glow),
-        0 0 26px rgba(0, 0, 0, 0.9);
+        0 0 26px rgba(0, 0, 0, 0.95);
     }
 
     .status-line {
@@ -258,7 +263,7 @@
       text-underline-offset: 2px;
     }
 
-    /* Slide-out history drawer */
+    /* HISTORY DRAWER */
     .history-drawer {
       position: fixed;
       top: 0;
@@ -266,15 +271,15 @@
       height: 100%;
       width: 78%;
       max-width: 320px;
-      background: rgba(5, 1, 8, 0.97);
-      box-shadow: 12px 0 40px rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.96);
+      box-shadow: 14px 0 50px rgba(0, 0, 0, 0.95);
       transform: translateX(-100%);
       transition: transform 0.25s ease-out;
       z-index: 5;
       display: flex;
       flex-direction: column;
-      padding: 18px 14px 24px 16px;
-      backdrop-filter: blur(16px);
+      padding: calc(env(safe-area-inset-top, 10px) + 8px) 16px 22px 16px;
+      backdrop-filter: blur(18px);
     }
 
     .history-drawer.open {
@@ -299,7 +304,7 @@
       border: none;
       background: transparent;
       color: var(--text-main);
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
     }
 
@@ -314,7 +319,7 @@
       padding: 10px 8px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.03);
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       font-size: 13px;
       color: var(--text-main);
       display: flex;
@@ -343,7 +348,6 @@
       color: var(--text-muted);
     }
 
-    /* Small screens adjustments */
     @media (min-width: 768px) {
       .content-layer {
         padding-left: clamp(40px, 15vw, 80px);
@@ -362,6 +366,7 @@
 </head>
 <body>
   <canvas id="code-rain"></canvas>
+  <div class="code-vignette"></div>
 
   <div class="app-root">
     <!-- History drawer -->
@@ -371,7 +376,6 @@
         <button class="history-close" id="historyCloseBtn">×</button>
       </div>
       <div class="history-list" id="historyList">
-        <!-- Demo items; you can wire this to n8n/localStorage later -->
         <div class="history-item">
           <span class="label">What is OpenWRT?</span>
           <button title="Delete">⌫</button>
@@ -431,62 +435,67 @@
   </div>
 
   <script>
-    // ---------- Falling neon code ----------
+    // -------- MATRIX-STYLE PINK PILL CODE (like NEO site) --------
     (function () {
-      const canvas = document.getElementById('code-rain');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.getElementById("code-rain");
+      const ctx = canvas.getContext("2d");
 
+      const glyphs = "01NEOALITA$".split("");
+      const dpr = window.devicePixelRatio || 1;
       let width = window.innerWidth;
       let height = window.innerHeight;
-      const dpr = window.devicePixelRatio || 1;
+      let fontSize = 18;
+      let columns;
+      let drops = [];
+      let speeds = [];
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-
-      const glyphs = 'AL1T0NE$✦'.split('');
-      const fontSize = 18;
-      let columns = Math.floor(width / fontSize);
-      const drops = [];
-      for (let i = 0; i < columns; i++) {
-        drops[i] = Math.random() * -20;
-      }
-
-      function resize() {
+      function init() {
         width = window.innerWidth;
         height = window.innerHeight;
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        fontSize = Math.max(14, Math.min(22, Math.floor(width / 40)));
         columns = Math.floor(width / fontSize);
-      }
-
-      window.addEventListener('resize', resize);
-
-      function draw() {
-        // translucent black for trail
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.font = fontSize + 'px Zerowax, monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.shadowColor = '#ff1fbf';
-        ctx.shadowBlur = 14;
+        drops = [];
+        speeds = [];
 
         for (let i = 0; i < columns; i++) {
-          const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+          drops[i] = Math.random() * -20;
+          // Slightly different speed per column
+          speeds[i] = 0.4 + Math.random() * 0.4;
+        }
+      }
+
+      window.addEventListener("resize", init);
+      init();
+
+      function draw() {
+        // darker fade to keep solid trails
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.font = fontSize + "px Zerowax, monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#ff33ff";
+
+        for (let i = 0; i < columns; i++) {
+          const char = glyphs[Math.floor(Math.random() * glyphs.length)];
           const x = i * fontSize + fontSize / 2;
           const y = drops[i] * fontSize;
 
-          ctx.fillStyle = '#ff3ad2';
-          ctx.fillText(text, x, y);
+          ctx.fillStyle = "#ff33ff";
+          ctx.fillText(char, x, y);
 
-          // Slow fall
-          drops[i] += 0.15 + Math.random() * 0.08;
+          drops[i] += speeds[i];
 
-          if (y > height + fontSize * 2) {
+          // reset column when it's off screen
+          if (y > height + fontSize * 2 || Math.random() > 0.995) {
             drops[i] = Math.random() * -20;
+            speeds[i] = 0.4 + Math.random() * 0.4;
           }
         }
 
@@ -496,41 +505,39 @@
       draw();
     })();
 
-    // ---------- History drawer toggle ----------
+    // -------- History drawer toggle --------
     (function () {
-      const drawer = document.getElementById('historyDrawer');
-      const openBtn = document.getElementById('historyOpenBtn');
-      const closeBtn = document.getElementById('historyCloseBtn');
+      const drawer = document.getElementById("historyDrawer");
+      const openBtn = document.getElementById("historyOpenBtn");
+      const closeBtn = document.getElementById("historyCloseBtn");
 
       function openDrawer() {
-        drawer.classList.add('open');
+        drawer.classList.add("open");
       }
       function closeDrawer() {
-        drawer.classList.remove('open');
+        drawer.classList.remove("open");
       }
 
-      openBtn.addEventListener('click', openDrawer);
-      closeBtn.addEventListener('click', closeDrawer);
+      openBtn.addEventListener("click", openDrawer);
+      closeBtn.addEventListener("click", closeDrawer);
 
-      drawer.addEventListener('click', (e) => {
+      // Clicking on dim background (if we ever add one)
+      drawer.addEventListener("click", (e) => {
         if (e.target === drawer) closeDrawer();
       });
     })();
 
-    // ---------- Form handler stub ----------
+    // -------- Form handler stub --------
     (function () {
-      const form = document.getElementById('alitaForm');
-      const input = document.getElementById('alitaInput');
+      const form = document.getElementById("alitaForm");
+      const input = document.getElementById("alitaInput");
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener("submit", (e) => {
         e.preventDefault();
         const msg = input.value.trim();
         if (!msg) return;
-
-        // This is where you wire to your n8n / local endpoint.
-        console.log('Message to ALITA:', msg);
-
-        input.value = '';
+        console.log("Message to ALITA:", msg);
+        input.value = "";
       });
     })();
   </script>
