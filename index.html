@@ -1,204 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEO Chat</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NEO</title>
 
 <style>
-  /* ===== GLOBAL ===== */
-  body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
-    background: black;
-    color: #fff;
-  }
+/* === GLOBAL THEME === */
+:root {
+    --pink: #ff009d;
+    --pink-glow: #ff00c8;
+    --blue-ai: #00eaff;
+    --bg: #000;
+    --panel-bg: rgba(10, 10, 15, 0.8);
+    --text: #fff;
+    --radius: 16px;
+    --blur: 30px;
+}
 
-  /* ===== MATRIX CANVAS ===== */
-  #matrix-canvas {
+/* === BODY === */
+body {
+    margin: 0;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+}
+
+/* === FALLING CODE CANVAS === */
+canvas {
     position: fixed;
     top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
+    width: 100vw; height: 100vh;
+    z-index: 0;
     background: black;
-  }
+}
 
-  /* ===== CHAT WINDOW ===== */
-  .chat-box {
-    width: 90%;
-    max-width: 500px;
-    margin: 4vh auto;
-    background: rgba(0,0,0,0.75);
-    border: 1px solid #ff009d;
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
-    overflow: hidden;
-  }
+/* === CHAT WRAPPER === */
+#chat-box {
+    position: absolute;
+    top: 12vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 480px;
+    background: var(--panel-bg);
+    border-radius: var(--radius);
+    backdrop-filter: blur(var(--blur));
+    padding: 20px;
+    box-shadow: 0 0 40px var(--pink-glow);
+    border: 1px solid rgba(255, 0, 157, 0.25);
+    z-index: 10;
+}
 
-  .chat-header {
-    padding: 16px;
-    background: #000;
-    color: #ff009d;
-    font-size: 2rem;
+/* === HEADER === */
+#header {
     text-align: center;
-    border-bottom: 1px solid #ff009d;
-  }
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--pink);
+    margin-bottom: 20px;
+}
 
-  .chat-body {
-    padding: 16px;
-    max-height: 65vh;
-    overflow-y: auto;
-  }
-
-  /* ===== MESSAGES ===== */
-  .msg {
-    margin-bottom: 14px;
+/* === MESSAGES === */
+.message {
+    margin-bottom: 20px;
     padding: 12px 16px;
-    border-radius: 12px;
-    width: fit-content;
-    max-width: 85%;
+    border-radius: var(--radius);
     font-size: 1rem;
-    line-height: 1.4;
-    animation: fadeIn .3s ease;
-  }
+    line-height: 1.45;
+}
 
-  .msg-ai {
-    background: #00c8ff;
+.bot {
+    background: linear-gradient(135deg, var(--blue-ai), #0090b5);
     color: #000;
-    border: 1px solid #00e1ff;
-    box-shadow: 0 0 10px #00e1ff;
-  }
+    text-shadow: 0px 0px 6px #fff;
+    box-shadow: 0 0 14px #00eaff;
+}
 
-  .msg-user {
-    background: #ff009d;
+.user {
+    background: var(--pink);
     color: #000;
-    border: 1px solid #ff4dd3;
-    box-shadow: 0 0 10px #ff009d;
-    margin-left: auto;
-  }
+    text-shadow: 0px 0px 6px #000;
+    box-shadow: 0 0 14px var(--pink-glow);
+    text-align: right;
+}
 
-  @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(6px);}
-    to {opacity: 1; transform: translateY(0);}
-  }
-
-  /* ===== INPUT AREA ===== */
-  .chat-input-area {
+/* === INPUT === */
+#input-area {
     display: flex;
-    border-top: 1px solid #ff009d;
-  }
+    margin-top: 8px;
+}
 
-  #chat-input {
+#user-input {
     flex: 1;
-    padding: 14px;
     background: #000;
-    color: #ff009d;
-    border: none;
-    outline: none;
+    border: 1px solid var(--pink);
+    padding: 14px;
+    border-radius: var(--radius) 0 0 var(--radius);
+    color: var(--text);
     font-size: 1rem;
-  }
+    outline: none;
+}
 
-  #send-btn {
+#send {
     padding: 14px 22px;
-    background: #ff009d;
-    border: none;
+    background: var(--pink);
     color: #000;
-    cursor: pointer;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    border: none;
     font-weight: bold;
-    transition: .2s;
-  }
+    cursor: pointer;
+    transition: 0.2s;
+}
 
-  #send-btn:hover {
-    background: #ff4dd3;
-  }
+#send:hover {
+    background: var(--pink-glow);
+}
 </style>
 </head>
 <body>
 
-<canvas id="matrix-canvas"></canvas>
+<canvas id="matrix"></canvas>
 
-<div class="chat-box">
-  <div class="chat-header">Hi there! 👋</div>
+<div id="chat-box">
+    <div id="header">NEO</div>
 
-  <div class="chat-body" id="chat-body">
-    <div class="msg msg-ai">
-      My name is NEO. How can I assist you today?
+    <div class="message bot">My name is NEO. How can I assist you today?</div>
+
+    <div id="messages"></div>
+
+    <div id="input-area">
+        <input id="user-input" placeholder="Message NEO..." />
+        <button id="send">➤</button>
     </div>
-  </div>
-
-  <div class="chat-input-area">
-    <input id="chat-input" type="text" placeholder="Type your question…">
-    <button id="send-btn">SEND</button>
-  </div>
 </div>
 
+
 <script>
-/* ===== MATRIX RAIN ===== */
-(function matrixRain() {
-  const canvas = document.getElementById("matrix-canvas");
-  const ctx = canvas.getContext("2d");
+/* === MESSAGE HANDLING === */
+const messages = document.getElementById("messages");
+const input = document.getElementById("user-input");
+const send = document.getElementById("send");
 
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  window.addEventListener("resize", resize);
-  resize();
+send.onclick = () => {
+    if (!input.value.trim()) return;
+    addMessage(input.value, "user");
+    input.value = "";
+    setTimeout(() => addMessage("Processing request…", "bot"), 800);
+};
 
-  const letters = "10NEO░▓█$*";
-  const fontSize = 22;
-  const speed = 0.9; // 👈 Adjust here if needed
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
+function addMessage(text, type) {
+    const div = document.createElement("div");
+    div.className = `message ${type}`;
+    div.innerText = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+}
 
-  function draw() {
-    ctx.fillStyle = "rgba(0,0,0,0.14)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+/* === SLOW NEON MATRIX === */
+const c = document.getElementById("matrix");
+const ctx = c.getContext("2d");
 
-    ctx.fillStyle = "#ff009d";
-    ctx.shadowColor = "#ff009d";
-    ctx.shadowBlur = 18;
+c.height = window.innerHeight;
+c.width = window.innerWidth;
+
+const symbols = "N E O $ 1 0".split("");
+const fontSize = 26;
+const columns = c.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, c.width, c.height);
+
+    ctx.fillStyle = "#ff00c8"; /* NEON PINK */
     ctx.font = fontSize + "px monospace";
 
-    for (let i = 0; i < drops.length; i++) {
-      const char = letters[Math.floor(Math.random() * letters.length)];
-      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+    drops.forEach((y, x) => {
+        const text = symbols[Math.floor(Math.random() * symbols.length)];
+        ctx.fillText(text, x * fontSize, y * fontSize);
 
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.985) drops[i] = 0;
-      drops[i] += speed;
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-</script>
+        if (y * fontSize > c.height && Math.random() > 0.99) drops[x] = 0;
+        drops[x] = y + 0.15; /* SLOW SPEED */
+    });
 
-<script>
-/* ===== CHAT SEND LOGIC (LOCAL DEMO) ===== */
-const chatBody = document.getElementById("chat-body");
-const input = document.getElementById("chat-input");
-document.getElementById("send-btn").onclick = send;
-
-function send() {
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMsg(text, "user");
-  input.value = "";
-
-  // FAKE AI reply for now — replace with webhook later
-  setTimeout(() => addMsg("I'm online, awaiting backend hookup.", "ai"), 800);
+    requestAnimationFrame(drawMatrix);
 }
-
-function addMsg(message, type) {
-  const div = document.createElement("div");
-  div.className = "msg msg-" + type;
-  div.textContent = message;
-  chatBody.appendChild(div);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
+drawMatrix();
 </script>
 
 </body>
