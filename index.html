@@ -1,395 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Alita • NEO Node</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --neo-pink: #ff0ea8;
-      --neo-pink-soft: #ff4fd0;
-      --neo-blue: #00d5ff;
-      --bg-deep: #050109;
-      --card-bg: rgba(5, 1, 14, 0.96);
-      --text-main: #fefbff;
-      --text-muted: #b3a7c9;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ALITA • Local Assistant Link</title>
 
-    * {
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
-    }
+<style>
+/* ===== ROOT BRANDING ===== */
+:root {
+  --pink: #ff009d;
+  --pink-glow: rgba(255, 0, 157, 0.65);
+  --blue-msg: #18e0ff;
+  --black: #000;
+  --text: #fff;
+}
 
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
-        sans-serif;
-      background: radial-gradient(circle at top, #1b021f 0, #050109 45%, #000 100%);
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+/* ===== GLOBAL RESET ===== */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro", Roboto, sans-serif;
+  background: var(--black);
+  touch-action: manipulation;
+}
 
-    /* Code rain canvas */
-    #codeRain {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-      pointer-events: none;
-    }
+/* ===== MATRIX CANVAS ===== */
+#matrix {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+  opacity: 0.22;
+}
 
-    .blur-vignette {
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at top center, rgba(255, 14, 168, 0.18), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(255, 14, 168, 0.15), transparent 55%);
-      mix-blend-mode: screen;
-      z-index: 0;
-    }
+/* ===== MAIN UI LAYER ===== */
+.app {
+  position: fixed;
+  inset: 0;         /* ignores iPhone safe areas */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  z-index: 2;
+  padding: 0;       /* ZERO SAFE AREA */
+}
 
-    /* Main layout */
-    .shell {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 480px;
-      padding: 1.5rem 1.25rem 2.25rem;
-    }
+/* ===== HEADER ===== */
+h1 {
+  margin-top: 3vh;
+  margin-bottom: 2vh;
+  font-size: 10vw;
+  letter-spacing: 0.25vw;
+  color: var(--pink);
+  text-shadow: 0 0 24px var(--pink-glow);
+  text-align: center;
+}
 
-    .card {
-      position: relative;
-      border-radius: 1.5rem;
-      padding: 1.4rem 1.2rem 1.6rem;
-      background: radial-gradient(circle at top, #1b031f, #050109 65%, #000 100%);
-      box-shadow:
-        0 0 40px rgba(255, 14, 168, 0.4),
-        0 0 120px rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(255, 14, 168, 0.7);
-      backdrop-filter: blur(18px);
-    }
+/* ===== AI OPENING MESSAGE ===== */
+.welcome {
+  margin-top: 1vh;
+  padding: 18px 24px;
+  font-size: 5vw;
+  background: var(--blue-msg);
+  color: var(--black);
+  border-radius: 18px;
+  box-shadow: 0 0 16px #00d5ff55;
+  max-width: 80vw;
+  text-align: center;
+}
 
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -2px;
-      border-radius: 1.6rem;
-      background: linear-gradient(
-        135deg,
-        rgba(255, 14, 168, 0.85),
-        rgba(0, 212, 255, 0.55),
-        rgba(255, 14, 168, 0.85)
-      );
-      opacity: 0.18;
-      z-index: -1;
-      filter: blur(6px);
-    }
+/* ===== INPUT BAR ===== */
+.input-row {
+  display: flex;
+  width: 90vw;
+  margin-top: auto;
+  margin-bottom: 3vh;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.8);
+  border: 2px solid var(--pink);
+  box-shadow: 0 0 18px var(--pink-glow);
+}
 
-    .title-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 1.2rem;
-    }
+input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 16px;
+  font-size: 4.2vw;
+  outline: none;
+}
 
-    .title-row h1 {
-      margin: 0;
-      font-size: 2.1rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      color: var(--neo-pink);
-      text-shadow:
-        0 0 12px rgba(255, 14, 168, 0.8),
-        0 0 30px rgba(255, 14, 168, 0.9);
-    }
+button {
+  width: 20vw;
+  background: var(--pink);
+  border: none;
+  color: var(--black);
+  font-weight: bold;
+  font-size: 4vw;
+  border-radius: 0 12px 12px 0;
+  cursor: pointer;
+  text-shadow: 0 0 6px #fff;
+}
 
-    .subtitle {
-      text-align: center;
-      margin: 0 0 1.1rem;
-      font-size: 0.86rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-    }
+/* Disable iOS tap highlight */
+input, button { -webkit-tap-highlight-color: transparent; }
 
-    .bubble {
-      border-radius: 1.4rem;
-      padding: 0.95rem 1.1rem;
-      font-size: 0.98rem;
-      line-height: 1.5;
-    }
-
-    .bubble.alita {
-      background: radial-gradient(circle at top, #00f0ff, var(--neo-blue));
-      color: #02040b;
-      font-weight: 600;
-      box-shadow:
-        0 0 26px rgba(0, 213, 255, 0.8),
-        0 0 40px rgba(0, 213, 255, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      margin-bottom: 1.15rem;
-    }
-
-    .bubble.meta {
-      margin-top: 0.25rem;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-align: right;
-      opacity: 0.8;
-    }
-
-    .input-row {
-      margin-top: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      background: rgba(0, 0, 0, 0.9);
-      border-radius: 999px;
-      border: 1px solid rgba(255, 14, 168, 0.65);
-      box-shadow: 0 0 28px rgba(255, 14, 168, 0.5);
-      overflow: hidden;
-    }
-
-    .input-row input {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: var(--text-main);
-      padding: 0.7rem 0.95rem;
-      font-size: 0.98rem;
-    }
-
-    .input-row input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .send-btn {
-      border: none;
-      outline: none;
-      padding: 0 1.1rem;
-      height: 100%;
-      background: var(--neo-pink);
-      color: #050109;
-      font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 0 999px 999px 0;
-      box-shadow:
-        0 0 18px rgba(255, 14, 168, 0.8),
-        0 0 40px rgba(255, 14, 168, 0.85);
-    }
-
-    .send-btn:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow:
-        0 0 12px rgba(255, 14, 168, 0.7),
-        0 0 26px rgba(255, 14, 168, 0.6);
-    }
-
-    .status-row {
-      margin-top: 0.7rem;
-      font-size: 0.74rem;
-      text-align: center;
-      color: var(--text-muted);
-      opacity: 0.85;
-    }
-
-    .status-tag {
-      color: var(--neo-pink-soft);
-      font-weight: 600;
-    }
-
-    /* Simple message list (local demo only) */
-    .thread {
-      margin-top: 1.1rem;
-      max-height: 36vh;
-      overflow-y: auto;
-      padding-right: 0.2rem;
-    }
-
-    .msg {
-      font-size: 0.9rem;
-      margin-bottom: 0.55rem;
-      display: flex;
-    }
-
-    .msg.user {
-      justify-content: flex-end;
-    }
-
-    .msg .pill {
-      padding: 0.55rem 0.85rem;
-      border-radius: 999px;
-      max-width: 80%;
-    }
-
-    .msg.user .pill {
-      background: var(--neo-pink);
-      color: #050109;
-      box-shadow: 0 0 18px rgba(255, 14, 168, 0.7);
-    }
-
-    .msg.alita .pill {
-      background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(0, 213, 255, 0.6);
-      color: var(--text-main);
-      box-shadow: 0 0 18px rgba(0, 213, 255, 0.5);
-    }
-
-    /* Mobile tweaks */
-    @media (max-width: 480px) {
-      .shell {
-        padding-inline: 1rem;
-      }
-      .card {
-        padding-inline: 1rem;
-      }
-      .title-row h1 {
-        font-size: 1.7rem;
-      }
-      .bubble.alita {
-        font-size: 0.95rem;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <canvas id="codeRain"></canvas>
-  <div class="blur-vignette"></div>
+<canvas id="matrix"></canvas>
 
-  <div class="shell">
-    <div class="card">
-      <div class="title-row">
-        <h1>ALITA</h1>
-      </div>
-      <p class="subtitle">NEO node • local assistant link</p>
+<div class="app">
+  <h1>ALITA</h1>
+  <div class="welcome">My name is ALITA. How can I assist you today?</div>
 
-      <div class="bubble alita">
-        My name is ALITA. How can I assist you today?
-      </div>
-      <div class="bubble meta">
-        Local demo UI • backend wiring handled on your node
-      </div>
-
-      <div class="thread" id="thread"></div>
-
-      <form class="input-row" id="chatForm">
-        <input
-          id="userInput"
-          type="text"
-          autocomplete="off"
-          placeholder="Message ALITA..."
-        />
-        <button class="send-btn" type="submit">SEND</button>
-      </form>
-
-      <div class="status-row">
-        Status:
-        <span class="status-tag">UI online</span> • Responses are local demo only
-      </div>
-    </div>
+  <div class="input-row">
+    <input id="msg" placeholder="Message ALITA..." />
+    <button>SEND</button>
   </div>
+</div>
 
-  <script>
-    // --- Neon code rain (slow) ---
-    const canvas = document.getElementById("codeRain");
-    const ctx = canvas.getContext("2d");
+<script>
+/* ===== SLOW PINK MATRIX FALL ===== */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-    let width, height, columns, drops;
-    const glyphs = "ALITA$NEO157".split("");
+function size() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+size();
+window.onresize = size;
 
-    function resizeCanvas() {
-      const dpr = window.devicePixelRatio || 1;
-      width = window.innerWidth;
-      height = window.innerHeight;
+const chars = "A L I T A $ 0 1".split("");
+const fontSize = 18;
+const cols = Math.floor(canvas.width / fontSize);
+const drops = Array(cols).fill(1);
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+function draw() {
+  ctx.fillStyle = "rgba(0,0,0,0.15)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#ff009d";
+  ctx.font = fontSize + "px monospace";
 
-      const columnWidth = 22;
-      columns = Math.floor(width / columnWidth);
-      drops = Array(columns)
-        .fill(0)
-        .map(() => Math.random() * (height / columnWidth));
-    }
+  drops.forEach((y, i) => {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, y * fontSize);
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    if (y * fontSize > canvas.height && Math.random() > 0.985) drops[i] = 0;
+    drops[i]++;
+  });
+}
 
-    function draw() {
-      // very gentle fade so trails linger
-      ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
-      ctx.fillRect(0, 0, width, height);
+setInterval(draw, 70); // SLOW + READABLE
+</script>
 
-      ctx.fillStyle = "#ff0ea8";
-      ctx.font = "16px monospace";
-
-      const columnWidth = 22;
-
-      for (let i = 0; i < columns; i++) {
-        const text = glyphs[Math.floor(Math.random() * glyphs.length)];
-        const x = i * columnWidth;
-        const y = drops[i] * columnWidth;
-
-        ctx.fillText(text, x, y);
-
-        // SUPER SLOW fall
-        if (y > height && Math.random() > 0.985) {
-          drops[i] = 0;
-        } else {
-          drops[i] += 0.12; // <— main speed control
-        }
-      }
-
-      requestAnimationFrame(draw);
-    }
-
-    requestAnimationFrame(draw);
-
-    // --- Local demo chat (no backend) ---
-    const form = document.getElementById("chatForm");
-    const input = document.getElementById("userInput");
-    const thread = document.getElementById("thread");
-
-    function addMessage(text, who) {
-      if (!text) return;
-      const row = document.createElement("div");
-      row.className = "msg " + who;
-      const pill = document.createElement("div");
-      pill.className = "pill";
-      pill.textContent = text;
-      row.appendChild(pill);
-      thread.appendChild(row);
-      thread.scrollTop = thread.scrollHeight;
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      addMessage(text, "user");
-      input.value = "";
-
-      // tiny fake reply so it feels alive even without n8n hooked
-      setTimeout(() => {
-        addMessage("Local UI demo – Alita will answer once the node is wired in.", "alita");
-      }, 500);
-    });
-  </script>
 </body>
 </html>
