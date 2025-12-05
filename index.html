@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <title>ALITA • Neo Node Assistant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#050108" />
 
-  <!-- Font -->
   <style>
     @font-face {
       font-family: "Zerowax";
@@ -17,14 +16,16 @@
     :root {
       --pink: #ff1fbf;
       --pink-soft: #ff5ed5;
-      --pink-glow: rgba(255, 31, 191, 0.6);
+      --pink-glow: rgba(255, 31, 191, 0.65);
       --cyan: #00d8ff;
+      --cyan-soft: #63f8ff;
       --text-main: #ffffff;
       --text-muted: #b69ecf;
     }
 
     * {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
@@ -32,19 +33,22 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #050103;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: #050108;
     }
 
+    /* Global background – same for login + chat */
     body {
-      background: radial-gradient(circle at top, #2c0032, #050108 70%);
+      background:
+        radial-gradient(circle at bottom center, #3a003b 0%, #140015 40%, #050108 78%, #020006 100%);
     }
 
     canvas#matrix {
       position: fixed;
       inset: 0;
-      width: 100%; height: 100%;
+      width: 100%;
+      height: 100%;
       z-index: 0;
       pointer-events: none;
     }
@@ -52,142 +56,217 @@
     .app-root {
       position: relative;
       z-index: 2;
-      width: 100%; height: 100%;
+      width: 100%;
+      height: 100%;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: stretch;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    /* LOGIN GATE */
+    /* -------- LOGIN GATE -------- */
     #loginGate {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.82);
-      backdrop-filter: blur(22px);
+      background: radial-gradient(circle at bottom center, rgba(58, 0, 59, 0.95), rgba(5, 1, 8, 0.98));
+      backdrop-filter: blur(24px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 18px;
       z-index: 6;
+      padding: 0 18px;
     }
 
     #loginGate h1 {
       font-family: "Zerowax";
       font-size: 44px;
       color: var(--pink);
-      text-shadow: 0 0 28px var(--pink-glow);
-      letter-spacing: 0.18em;
+      letter-spacing: 0.22em;
+      text-shadow:
+        0 0 28px var(--pink-glow),
+        0 0 8px rgba(0,0,0,0.9);
     }
 
     #loginGate p {
       color: var(--text-muted);
-      font-size: 13px;
-      letter-spacing: 0.12em;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
     }
 
     .login-box {
       display: flex;
       flex-direction: column;
       gap: 14px;
-      width: 80%;
-      max-width: 360px;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 10px;
     }
 
     .login-input {
       border: none;
-      padding: 14px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 12px;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 18px;
       color: var(--text-main);
       font-size: 15px;
       outline: none;
+      box-shadow:
+        0 0 24px rgba(0, 0, 0, 0.9),
+        0 0 26px rgba(0, 0, 0, 0.7);
     }
 
     .login-input::placeholder {
-      color: #a088b6;
+      color: #8f7aa7;
     }
 
     #loginBtn {
-      padding: 14px;
-      border-radius: 14px;
+      padding: 14px 16px;
+      border-radius: 22px;
       border: none;
       background: linear-gradient(135deg, var(--pink), var(--pink-soft));
       color: #050108;
       font-weight: 700;
-      letter-spacing: 0.13em;
+      font-size: 14px;
+      letter-spacing: 0.18em;
       cursor: pointer;
-      box-shadow: 0 0 22px var(--pink-glow);
+      box-shadow:
+        0 0 28px var(--pink-glow),
+        0 0 40px rgba(0,0,0,0.8);
     }
 
-    /* MAIN UI */
+    #loginBtn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow:
+        0 0 18px var(--pink-glow),
+        0 0 26px rgba(0,0,0,0.9);
+    }
+
+    /* -------- MAIN CHAT UI -------- */
     .content {
       display: none;
       flex-direction: column;
       width: 100%;
       height: 100%;
-      padding: 24px 16px;
+      padding: 24px 16px 22px;
+      color: var(--text-main);
+      /* transparent so we see same global background as login */
+      background: transparent;
     }
 
-    header .title {
-      font-family: "Zerowax";
-      font-size: 42px;
-      letter-spacing: 0.22em;
+    header {
       text-align: center;
-      margin-top: 6px;
+      margin-top: 4px;
+    }
+
+    .title {
+      font-family: "Zerowax";
+      font-size: 40px;
+      letter-spacing: 0.22em;
       color: var(--pink);
-      text-shadow: 0 0 32px var(--pink-glow);
+      text-shadow:
+        0 0 32px var(--pink-glow),
+        0 0 10px rgba(0,0,0,0.9);
+      margin-bottom: 4px;
     }
 
     .subtitle {
-      text-align: center;
-      margin-top: 4px;
       font-size: 11px;
-      letter-spacing: 0.28em;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
       color: var(--text-muted);
     }
 
     .bubble-ai {
-      margin: 36px auto;
+      margin: 34px auto 28px;
       max-width: 90%;
-      padding: 18px;
-      background: linear-gradient(135deg, var(--cyan), #63f8ff);
+      padding: 18px 18px 20px;
       border-radius: 24px;
-      color: #000b10;
+      background: radial-gradient(circle at top, var(--cyan-soft), var(--cyan));
+      color: #001018;
       font-size: 16px;
-      box-shadow: 0 0 34px rgba(0, 255, 255, .4);
+      line-height: 1.4;
+      box-shadow:
+        0 0 26px rgba(0, 216, 255, 0.55),
+        0 0 60px rgba(0,0,0,0.9);
     }
 
     .inputRow {
       margin-top: auto;
       display: flex;
-      background: rgba(0,0,0,0.7);
-      border-radius: 50px;
-      box-shadow: 0 0 32px rgba(255,0,200,0.35);
-      backdrop-filter: blur(18px);
+      align-items: center;
       padding: 4px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 31, 191, 0.35), rgba(0, 0, 0, 0.8));
+      box-shadow:
+        0 0 22px rgba(0,0,0,0.9),
+        0 0 30px rgba(255, 31, 191, 0.45);
+      backdrop-filter: blur(18px);
     }
 
     .inputRow input {
-      border: none;
       flex: 1;
-      padding: 14px;
-      color: white;
+      border: none;
+      outline: none;
       background: transparent;
+      padding: 12px 14px 12px 16px;
+      color: var(--text-main);
       font-size: 15px;
+    }
+
+    .inputRow input::placeholder {
+      color: rgba(255, 255, 255, 0.55);
     }
 
     .inputRow button {
       border: none;
+      outline: none;
+      padding: 10px 22px;
+      border-radius: 999px;
       background: linear-gradient(135deg, var(--pink), var(--pink-soft));
-      padding: 12px 22px;
-      border-radius: 40px;
-      font-size: 13px;
-      font-weight: bold;
-      letter-spacing: 0.18em;
       color: #050108;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.18em;
       cursor: pointer;
+      box-shadow:
+        0 0 22px var(--pink-glow),
+        0 0 38px rgba(0,0,0,0.85);
+    }
+
+    .inputRow button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow:
+        0 0 14px var(--pink-glow),
+        0 0 26px rgba(0,0,0,0.9);
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 11px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .status .pill {
+      color: var(--pink-soft);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    @media (min-width: 768px) {
+      .content {
+        padding-left: clamp(40px, 20vw, 80px);
+        padding-right: clamp(40px, 20vw, 80px);
+      }
+
+      .bubble-ai {
+        max-width: 70%;
+      }
     }
   </style>
 </head>
@@ -196,95 +275,165 @@
   <canvas id="matrix"></canvas>
 
   <div class="app-root">
-
     <!-- LOGIN GATE -->
-    <div id="loginGate">
+    <section id="loginGate">
       <h1>ALITA</h1>
       <p>SECURE ACCESS NODE</p>
+
       <div class="login-box">
-        <input id="user" class="login-input" type="text" placeholder="Username" />
-        <input id="pass" class="login-input" type="password" placeholder="Password" />
+        <input id="user" class="login-input" type="text" placeholder="Username" autocomplete="username" />
+        <input id="pass" class="login-input" type="password" placeholder="Password" autocomplete="current-password" />
         <button id="loginBtn">LOGIN</button>
       </div>
-    </div>
+    </section>
 
-    <!-- MAIN UI -->
-    <div class="content" id="mainUI">
+    <!-- MAIN CHAT UI -->
+    <main class="content" id="mainUI">
       <header>
         <div class="title">ALITA</div>
-        <div class="subtitle"> ASSISTANT </div>
+        <div class="subtitle">LOCAL ASSISTANT LINK</div>
       </header>
 
       <section class="bubble-ai">
         My name is ALITA. How can I assist you today?
       </section>
 
-      <form class="inputRow" id="msgForm">
+      <form class="inputRow" id="msgForm" autocomplete="off">
         <input id="msgInput" type="text" placeholder="Message ALITA…" />
         <button type="submit">SEND</button>
       </form>
-    </div>
+
+      <div class="status">
+        Status: <span class="pill">UI online</span> • Backend wiring handled on your node
+      </div>
+    </main>
   </div>
 
   <script>
-    /* -------- LOGIN ---------- */
+    /* ========== LOGIN WITH PERSISTENT SESSION ========== */
+
+    // Change these if you want different creds
     const VALID_USER = "neo";
     const VALID_PASS = "alita";
 
-    document.getElementById("loginBtn").onclick = () => {
-      const u = user.value.trim().toLowerCase();
-      const p = pass.value.trim().toLowerCase();
+    // 12-hour session (in ms). Change if you want longer/shorter.
+    const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
+    const SESSION_KEY = "alita_session_expires_v1";
+
+    const loginGate = document.getElementById("loginGate");
+    const mainUI    = document.getElementById("mainUI");
+    const userInput = document.getElementById("user");
+    const passInput = document.getElementById("pass");
+    const loginBtn  = document.getElementById("loginBtn");
+
+    function showMain() {
+      loginGate.style.display = "none";
+      mainUI.style.display = "flex";
+    }
+
+    function saveSession() {
+      const expiresAt = Date.now() + SESSION_DURATION_MS;
+      localStorage.setItem(SESSION_KEY, String(expiresAt));
+    }
+
+    function hasValidSession() {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return false;
+      const exp = parseInt(raw, 10);
+      if (Number.isNaN(exp)) return false;
+      return Date.now() < exp;
+    }
+
+    // Auto-login on page load if session still valid
+    if (hasValidSession()) {
+      showMain();
+    }
+
+    loginBtn.addEventListener("click", () => {
+      const u = userInput.value.trim().toLowerCase();
+      const p = passInput.value.trim().toLowerCase();
 
       if (u === VALID_USER && p === VALID_PASS) {
-        loginGate.style.display = "none";
-        mainUI.style.display = "flex";
+        saveSession();
+        showMain();
       } else {
-        pass.value = "";
-        pass.placeholder = "Access Denied";
+        passInput.value = "";
+        passInput.placeholder = "Access denied";
       }
-    };
+    });
 
-    /* -------- MATRIX CODE RAIN ---------- */
+    // Allow pressing Enter on password field to login
+    passInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        loginBtn.click();
+      }
+    });
+
+    /* ========== MATRIX-STYLE NEON CODE RAIN ========== */
+
     const canvas = document.getElementById("matrix");
     const ctx = canvas.getContext("2d");
-
-    const glyphs = "A L I T A 0 1 $".split(" ");
+    const glyphs = "0 1 A L I T A $".split(" ");
     const fontSize = 20;
-    let w, h, cols, drops;
+    let w, h, columns, drops;
 
-    function resize() {
+    function resizeMatrix() {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
-      cols = Math.floor(w / fontSize);
-      drops = Array(cols).fill(-10);
+      columns = Math.floor(w / fontSize);
+      drops = Array(columns).fill(-10).map(d => d - Math.random() * 20);
     }
-    resize();
-    window.onresize = resize;
 
-    function draw() {
-      ctx.fillStyle = "rgba(5,0,10,0.2)";
+    window.addEventListener("resize", resizeMatrix);
+    resizeMatrix();
+
+    function drawMatrix() {
+      // slightly translucent to keep trails
+      ctx.fillStyle = "rgba(5, 0, 10, 0.22)";
       ctx.fillRect(0, 0, w, h);
 
       ctx.font = fontSize + "px Zerowax, monospace";
-      ctx.shadowColor = "#ff1fbf";
-      ctx.shadowBlur = 12;
       ctx.textAlign = "center";
+      ctx.shadowColor = "#ff1fbf";
+      ctx.shadowBlur = 14;
 
-      drops.forEach((y, i) => {
+      for (let i = 0; i < columns; i++) {
         const text = glyphs[Math.floor(Math.random() * glyphs.length)];
         const x = i * fontSize + fontSize / 2;
+        const y = drops[i] * fontSize;
+
         ctx.fillStyle = "#ff4ee6";
-        ctx.fillText(text, x, y * fontSize);
+        ctx.fillText(text, x, y);
 
-        drops[i] += 0.12 + Math.random() * 0.05; // SLOW FALL
+        // Slow, smooth fall
+        drops[i] += 0.12 + Math.random() * 0.05;
 
-        if (y * fontSize > h + 80) drops[i] = -8;
-      });
+        if (y > h + fontSize * 2) {
+          drops[i] = -10 - Math.random() * 20;
+        }
+      }
 
-      requestAnimationFrame(draw);
+      requestAnimationFrame(drawMatrix);
     }
-    draw();
-  </script>
 
+    drawMatrix();
+
+    /* ========== MESSAGE FORM STUB ========== */
+
+    const msgForm = document.getElementById("msgForm");
+    const msgInput = document.getElementById("msgInput");
+
+    msgForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = msgInput.value.trim();
+      if (!text) return;
+
+      // Hook this up to your n8n / local endpoint later.
+      console.log("Message to ALITA:", text);
+
+      msgInput.value = "";
+    });
+  </script>
 </body>
 </html>
